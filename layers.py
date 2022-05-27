@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class ResBlock(nn.Module):
+class ResidualBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 3):
         """
         Residual block as in https://arxiv.org/abs/1512.03385
@@ -12,7 +12,7 @@ class ResBlock(nn.Module):
             out_channels (int): number of output channels
             kernel_size: filter size for convolutions
         """
-        super(ResBlock, self).__init__()
+        super(ResidualBlock, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding="same")
         self.conv1_bn = nn.BatchNorm2d(out_channels)
