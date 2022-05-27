@@ -33,14 +33,14 @@ class ResidualBlock(nn.Module):
 
     def forward(self, x):
         identity = self.shortcut(x)
-        print("identity:", identity.shape)
+
         x = self.conv1(x)
         x = self.conv1_bn(x)
         x = self.activation(x)
 
         x = self.conv2(x)
         x = self.conv2_bn(x)
-        print("x:", x.shape)
+
         x += identity
         x = self.activation(x)
 
