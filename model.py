@@ -4,35 +4,31 @@ from layers import ResidualBlock
 
 
 class ResNet(nn.Module):
-    def __init__(self, input_shape: tuple, blocks: list = [64, 64, 128, 128, 256, 256], kernel_size: int = 3):
+    def __init__(self, in_channels: int = 3, blocks: list = [64, 64, 128, 128, 256, 256], kernel_size: int = 3):
         """
-        Make a ResNet with residual blocks.
+        Make a Residual Network according to the paper of He et al. (2016) [https://arxiv.org/abs/1512.03385].
 
         Args:
-            input_shape (tuple): Shape of the input image (n_channels, height, width)
+            in_channels (int): Number of input channels, e.g. 3 for RGB images.
             blocks (list): List of channels, where each number represents a residual block
             kernel_size (int): kernel size for the convolutional layers
         """
         super().__init__()
 
-        n_channels, height, width = input_shape
+        self.conv7x7 = nn.Conv2d(in_channels, blocks[0], kernel_size=(7, 7), padding=(3, 3), stride=(2, 2))
 
-        self.conv1 = nn.Conv2d(n_channels, blocks[0], kernel_size=3, padding=1)
-
-        self.blocks = nn.ModuleList()
-        in_channels = blocks[0]
+        self.residual_blocks = nn.ModuleList()
+        running_in_channels = blocks[0]
         for block_channels in blocks:
-            self.blocks.append(
-                ResidualBlock(in_channels, block_channels)
+            self.residual_blocks.append(
+                ResidualBlock(running_in_channels, block_channels, kernel_size=kernel_size)
             )
-            in_channels = block_channels
+            running_in_channels = block_channels
 
     def forward(self, x):
-        print("start:", x.shape)
-        x = self.conv1(x)
-        print("after first conv:", x.shape)
-        for block in self.blocks:
-            print(x.shape)
+        x = self.conv7x7(x)
+
+        for block in self.residual_blocks:
             x = block(x)
 
         return x
@@ -41,13 +37,13 @@ class ResNet(nn.Module):
 if __name__ == "__main__":
 
     img_shape = (3, 128, 128)
-    model = ResNet(img_shape)
+    model = ResNet()
 
-    x = torch.randn((32, *img_shape))
+    img_batch = torch.randn((32, *img_shape))
 
-    print("Input shape:", x.shape)
-    print(model)
-    out = model(x)
+    print("Input shape:", img_batch.shape)
+    print("forward pass...")
+    out = model(img_batch)
 
     print("Output shape:", out.shape)
 
