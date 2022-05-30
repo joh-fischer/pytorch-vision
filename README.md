@@ -1,15 +1,22 @@
 # ResNet Implementation
 
-Implementing ResNet for training on CIFAR10 with GPU.
+Implementing CIFAR10 classifying ResNet trained on GPU.
 
 ## Todo
 - GPU access
+  - to(device)
 - argparse
-- learning rate decay (first high, then low)
+  - set hyperparameters
+- architecture as in ResNet paper
+  - filters (16, 32, ...)
+  - avgpool2d (GAP)
+  - 2x maxpool
 - += residual
 - progress bar as wright
-- avgpool2d (GAP)
-- 7x7 conv decomposed into three 3x3 convs
 - TensorBoard support
 - Custom Logger
-- (maxpool in beginning)
+- maybe make improved ResNet
+  - use swish activation function
+  - learning rate decay (first high, then low)
+  - 7x7 decomposed into three 3x3 convs (ref literature)
+- torchviz visualization
