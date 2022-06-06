@@ -4,6 +4,7 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
 
 ## Todo
 - GPU access
+  - multiple GPU support
   - to(device)
 - argparse
   - set hyperparameters
@@ -20,3 +21,6 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - learning rate decay (first high, then low)
   - 7x7 decomposed into three 3x3 convs (ref literature)
 - torchviz visualization
+
+## Links
+- https://github.com/pytorch/examples/blob/main/imagenet/main.py
