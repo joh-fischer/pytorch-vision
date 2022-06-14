@@ -31,6 +31,8 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - filters (16, 32, ...)
   - avgpool2d (GAP)
 
+Please ensure that you're using Python version 3.9 or above.
+
 ## Links
 - https://github.com/pytorch/examples/blob/main/imagenet/main.py
 - https://github.com/matthias-wright/cifar10-resnet
