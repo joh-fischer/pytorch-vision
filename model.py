@@ -5,7 +5,7 @@ from layers import ResidualBlock
 
 class ResNet(nn.Module):
     def __init__(self, in_channels: int = 3, blocks: list = [16, 16, 32, 32, 64, 64], kernel_size: int = 3,
-                 conv_out_shape: tuple = (8, 8), n_classes: int = 10, first_conv_config: dict = None):
+                 conv_out_size: int = 8, n_classes: int = 10, first_conv_config: dict = None):
         """
         Create a Residual Network according to the paper of He et al. (2016) [https://arxiv.org/abs/1512.03385].
 
@@ -14,7 +14,8 @@ class ResNet(nn.Module):
             blocks (list): List of channels, where each number represents a residual block and its respective number of
                 filters.
             kernel_size (int): Kernel size for the convolutional layers, default: 3.
-            conv_out_shape (tuple): Output shape of final convolutional layer, required for global average pooling.
+            conv_out_size (int): Output size of final convolutional layer (e.g. 8 for a 8x8), required for global
+                average pooling layer.
             n_classes (int): Number of output classes.
             first_conv_config (dict): Dictionary of key-value pairs for first convolutional layer. If not specified
                 it is {'kernel_size': 3, 'padding': 1, 'stride': 1}.
@@ -32,7 +33,7 @@ class ResNet(nn.Module):
             )
             running_in_channels = block_channels
 
-        self.avg_pool = nn.AvgPool2d(kernel_size=conv_out_shape)
+        self.avg_pool = nn.AvgPool2d(kernel_size=conv_out_size)
 
         self.out = nn.Linear(blocks[-1], n_classes)
 
