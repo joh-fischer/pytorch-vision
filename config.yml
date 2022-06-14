@@ -1,0 +1,16 @@
+# config file for ResNet model
+in_channels: 3
+blocks:
+  - 16
+  - 16
+  - 32
+  - 32
+  - 64
+  - 64
+kernel_size: 3
+conv_out_size: 8
+n_classes: 10
+first_conf_config:
+  kernel_size: 3
+  padding: 1
+  stride: 1
