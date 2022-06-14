@@ -24,6 +24,7 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - learning rate of 0.1 
   - divide by 10 at 32k and 48k iterations
   - end training after 64k iterations
+  - batch size 128
 - data preprocessing
   - per pixel mean subtracted
   - 4 pixel padding and center crop
