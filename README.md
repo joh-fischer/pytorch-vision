@@ -8,10 +8,6 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - to(device)
 - argparse
   - set hyperparameters
-- architecture as in ResNet paper
-  - filters (16, 32, ...)
-  - avgpool2d (GAP)
-  - 2x maxpool
 - progress bar as wright
 - TensorBoard support
 - Custom Logger
@@ -29,6 +25,11 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - per pixel mean subtracted
   - 4 pixel padding and center crop
   - horizontal flip
+
+## Description
+- architecture as in ResNet paper for CIFAR-10
+  - filters (16, 32, ...)
+  - avgpool2d (GAP)
 
 ## Links
 - https://github.com/pytorch/examples/blob/main/imagenet/main.py
