@@ -10,7 +10,7 @@ blocks:
 kernel_size: 3
 conv_out_size: 8
 n_classes: 10
-first_conf_config:
+first_conv_cfg:
   kernel_size: 3
   padding: 1
   stride: 1

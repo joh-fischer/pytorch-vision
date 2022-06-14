@@ -5,7 +5,7 @@ from layers import ResidualBlock
 
 class ResNet(nn.Module):
     def __init__(self, in_channels: int = 3, blocks: list = [16, 16, 32, 32, 64, 64], kernel_size: int = 3,
-                 conv_out_size: int = 8, n_classes: int = 10, first_conv_config: dict = None):
+                 conv_out_size: int = 8, n_classes: int = 10, first_conv_cfg: dict = None):
         """
         Create a Residual Network according to the paper of He et al. (2016) [https://arxiv.org/abs/1512.03385].
 
@@ -17,12 +17,12 @@ class ResNet(nn.Module):
             conv_out_size (int): Output size of final convolutional layer (e.g. 8 for a 8x8), required for global
                 average pooling layer.
             n_classes (int): Number of output classes.
-            first_conv_config (dict): Dictionary of key-value pairs for first convolutional layer. If not specified
+            first_conv_cfg (dict): Dictionary of key-value pairs for first convolutional layer. If not specified
                 it is {'kernel_size': 3, 'padding': 1, 'stride': 1}.
         """
         super().__init__()
 
-        conv_config = first_conv_config if first_conv_config else {'kernel_size': 3, 'padding': 1, 'stride': 1}
+        conv_config = first_conv_cfg if first_conv_cfg else {'kernel_size': 3, 'padding': 1, 'stride': 1}
         self.first_conv = nn.Conv2d(in_channels, blocks[0], **conv_config)
 
         self.residual_blocks = nn.ModuleList()
@@ -63,4 +63,3 @@ if __name__ == "__main__":
     out = model(img_batch)
 
     print("Output shape:", out.shape)
-
