@@ -33,3 +33,8 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
 
 ## Links
 - https://github.com/pytorch/examples/blob/main/imagenet/main.py
+- https://github.com/matthias-wright/cifar10-resnet
+
+## License
+
+This project is licensed under the MIT Licence
