@@ -12,6 +12,7 @@ class CIFAR10:
             batch_size (int): Batch size, default: 16.
         """
         self.classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+        self.n_classes = 10
 
         self.batch_size = batch_size
 
@@ -42,3 +43,11 @@ class CIFAR10:
     def val(self):
         """ Return validation dataloader. """
         return self.val_loader
+
+    def idx2label(self, idx):
+        """ Return class label for given index. """
+        return self.classes[idx]
+
+    def prob2label(self, prob_vector):
+        """ Return class label with highest confidence. """
+        return self.idx2label(torch.argmax(prob_vector).cpu())
