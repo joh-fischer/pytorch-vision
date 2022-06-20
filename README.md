@@ -2,15 +2,20 @@
 
 Implementing CIFAR10 classifying ResNet trained on GPU.
 
+## Usage
+
+Please ensure that you're using Python version 3.9 or above.
+
 ## Todo
+- include top $k$ accuracy
+- start from checkpoint with dict -> state_dict, epoch, ...
+- tensorboard
+  - visualize examples and assigned class probabilities
+  - writer.add_fig(...)
 - GPU access
   - multiple GPU support
   - to(device)
-- argparse
-  - set hyperparameters
 - progress bar as wright
-- TensorBoard support
-- Custom Logger
 - maybe make improved ResNet
   - use swish activation function
   - learning rate decay (first high, then low)
@@ -21,17 +26,20 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
   - divide by 10 at 32k and 48k iterations
   - end training after 64k iterations
   - batch size 128
-- data preprocessing
-  - per pixel mean subtracted
-  - 4 pixel padding and center crop
-  - horizontal flip
+
 
 ## Description
 - architecture as in ResNet paper for CIFAR-10
   - filters (16, 32, ...)
   - avgpool2d (GAP)
+- Custom Logger
+- TensorBoard support
+- data preprocessing
+  - per pixel mean subtracted
+  - 4 pixel padding and center crop
+  - horizontal flip
 
-Please ensure that you're using Python version 3.9 or above.
+
 
 ## Links
 - https://github.com/pytorch/examples/blob/main/imagenet/main.py
