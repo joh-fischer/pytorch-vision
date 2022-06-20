@@ -32,3 +32,13 @@ class CIFAR10:
         self.val_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True,
                                                     transform=transforms.ToTensor())
         self.val_loader = torch.utils.data.DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False)
+
+    @property
+    def train(self):
+        """ Return training dataloader. """
+        return self.train_loader
+
+    @property
+    def val(self):
+        """ Return validation dataloader. """
+        return self.val_loader
