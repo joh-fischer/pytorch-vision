@@ -34,6 +34,7 @@ Please ensure that you're using Python version 3.9 or above.
   - avgpool2d (GAP)
 - Custom Logger
 - TensorBoard support
+- describe config file
 - data preprocessing
   - per pixel mean subtracted
   - 4 pixel padding and center crop
