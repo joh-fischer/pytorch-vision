@@ -7,6 +7,7 @@ Implementing CIFAR10 classifying ResNet trained on GPU.
 Please ensure that you're using Python version 3.9 or above.
 
 ## Todo
+- make model folder
 - include top $k$ accuracy
 - start from checkpoint with dict -> state_dict, epoch, ...
 - tensorboard
