@@ -3,3 +3,7 @@ venv*
 __pycache__
 *.swp
 data
+
+# logs and checkpoints
+logs
+checkpoints

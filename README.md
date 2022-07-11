@@ -1,15 +1,13 @@
 # ResNet Implementation
 
-Implementing CIFAR10 classifying ResNet trained on GPU.
+Implementing CIFAR10 Residual Network ([He et al., 2016](https://arxiv.org/abs/1512.03385)]) in PyTorch.
 
 ## Usage
 
 Please ensure that you're using Python version 3.9 or above.
 
 ## Todo
-- make model folder
-- include top $k$ accuracy
-- start from checkpoint with dict -> state_dict, epoch, ...
+- compare different network width and depth
 - tensorboard
   - visualize examples and assigned class probabilities
   - writer.add_fig(...)
@@ -21,7 +19,6 @@ Please ensure that you're using Python version 3.9 or above.
   - use swish activation function
   - learning rate decay (first high, then low)
   - 7x7 decomposed into three 3x3 convs (ref literature)
-- torchviz visualization
 - training
   - learning rate of 0.1 
   - divide by 10 at 32k and 48k iterations
@@ -40,7 +37,7 @@ Please ensure that you're using Python version 3.9 or above.
   - per pixel mean subtracted
   - 4 pixel padding and center crop
   - horizontal flip
-
+- start from checkpoint with dict -> state_dict, epoch, ...
 
 
 ## Links

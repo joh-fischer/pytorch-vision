@@ -19,7 +19,7 @@
 # SOFTWARE.
 import torch
 import torch.nn as nn
-from layers import ResidualBlock
+from .layers import ResidualBlock
 
 
 class ResNet(nn.Module):

@@ -7,12 +7,11 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
-from torch.utils.tensorboard import SummaryWriter
 
-from model import ResNet
+from resnet import ResNet
+from logger import Logger
 from dataloader import CIFAR10
-from utils.logger import Logger
-
+from utils import load_checkpoint, timer, save_checkpoint
 
 CHECKPOINT_DIR = 'checkpoints'
 LOG_DIR = 'logs'
@@ -28,8 +27,8 @@ parser.add_argument('--batch-size', default=8, metavar='N',
                     type=int, help='Mini-batch size (default: 8)')
 parser.add_argument('--lr', default=0.01,
                     type=float, metavar='LR', help='Initial learning rate (default: 0.01)')
-parser.add_argument('--config', default='config.yml',
-                    metavar='PATH', help='Path to model config file (default: config.yml)')
+parser.add_argument('--config', default='config.yaml',
+                    metavar='PATH', help='Path to model config file (default: config.yaml)')
 parser.add_argument('--gpus', default=0, type=int,
                     nargs='+', metavar='GPUS', help='If GPU(s) available, which GPU(s) to use for training.')
 parser.add_argument('--ckpt-save', default=True, action=argparse.BooleanOptionalAction,
@@ -38,10 +37,9 @@ parser.add_argument('--load-ckpt', default=None, metavar='PATH',
                     dest='load_checkpoint', help='Load model checkpoint and continue training')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='Evaluate model on test set')
-parser.add_argument('--log-save-interval', default=5, type=int,
-                    metavar='N', help="Interval in which logs are saved to disk (default: 5)")
+parser.add_argument('--log-save-interval', default=5, type=int, metavar='N',
+                    dest='save_interval', help="Interval in which logs are saved to disk (default: 5)")
 
-writer = None
 logger = Logger(LOG_DIR)
 
 
@@ -64,12 +62,9 @@ def main():
         os.makedirs(running_ckpt_dir)
 
     global logger
-    logger = Logger(running_log_dir)
-    logger.log_hparams({**cfg, **vars(args)})
-    global writer
-    writer = SummaryWriter(running_log_dir)
+    logger = Logger(running_log_dir, tensorboard=True)
 
-    # setup devices
+    # setup GPU
     # TODO: include multi-gpu training
     device = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
     print("{:<16}: {}\n".format('device', device))
@@ -77,85 +72,89 @@ def main():
     # load data
     data = CIFAR10(args.batch_size)
 
-    # create model
+    # create model, loss function and optimizer
     model = ResNet(**cfg)
-    if args.load_checkpoint:
-        model.load_state_dict(torch.load(args.load_checkpoint))
     model.to(device)
-
-    # define loss function and optimizer
-    criterion = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.Adam(model.parameters(), args.lr)
+    criterion = nn.CrossEntropyLoss().to(device)
+
+    if args.load_checkpoint:
+        model, optimizer, start_epoch = load_checkpoint(model, optimizer, args.load_checkpoint, device)
+        args.epochs += start_epoch
+    else:
+        start_epoch = 0
 
     if args.evaluate:
-        # TODO: evaluate
-        pass
+        logger.init_epoch()
+        validate(model, data.val, criterion, device)
+        print("\n{:>8}: {:.4f} - {:>8}: {:.4f}".format('val_loss', logger.epoch['val_loss'].avg,
+                                                       'val_acc', 100. * logger.epoch['val_acc'].avg))
+        return
 
     # start run
+    logger.log_hparams({**cfg, **vars(args)})
     t_start = time.time()
-    for epoch in range(args.epochs):
-        logger.init_epoch()
+    for epoch in range(start_epoch, args.epochs):
+        logger.init_epoch(epoch)
+        print(f"Epoch [{epoch + 1} / {args.epochs}]")
 
-        print(f"Epoch [{epoch+1} / {args.epochs}]")
-
-        # TODO: add accuracy (top-1 and top-5)
         train(model, data.train, criterion, optimizer, device)
-        writer.add_scalar('Loss/train', logger.epoch['loss'].avg, epoch)
-
         validate(model, data.val, criterion, device)
-        writer.add_scalar('Loss/val', logger.epoch['val_loss'].avg, epoch)
 
-        print(f"loss: {logger.epoch['loss'].avg:.3f} - val_loss: {logger.epoch['val_loss'].avg:.3f}")
+        # log to tensorboard
+        logger.tensorboard.add_scalars('Accuracy', {'train_acc': logger.epoch['acc'].avg,
+                                                    'val_acc': logger.epoch['val_acc'].avg}, epoch)
+        logger.tensorboard.add_scalars('Loss', {'train_loss': logger.epoch['loss'].avg,
+                                                'val_loss': logger.epoch['val_loss'].avg}, epoch)
 
-        if args.save_checkpoint:
-            torch.save(model.state_dict(), os.path.join(running_ckpt_dir, f'e{epoch}.ckpt'))
+        # output progress
+        print("\n{:>8}: {:.4f} - {:>8}: {:.4f} - {:>4}: {:.2f} - {:>4}: {:.2f}".format(
+            'loss', logger.epoch['loss'].avg, 'val_loss', logger.epoch['val_loss'].avg,
+            'acc', 100. * logger.epoch['acc'].avg, 'val_acc', 100. * logger.epoch['val_acc'].avg))
 
-        if epoch % args.log_save_interval == 0:
+        # save logs and checkpoint
+        if (epoch + 1) % args.save_interval == 0 or (epoch + 1) == args.epochs:
             logger.save()
+            if args.save_checkpoint:
+                save_checkpoint(model, optimizer, running_ckpt_dir, logger)
 
-    logger.save()
-
-    t_end = time.time() - t_start
-    print(f"Total training time: {t_end:.4f} s")
-
-    # TODO: write to summary file
-    write_summary(args.name, running_log_dir, running_ckpt_dir,
-                  args.config, args.epochs, t_end,
-                  logger.epoch['loss'].avg, logger.epoch['val_loss'].avg)
+    elapsed_time = timer(t_start, time.time())
+    print(f"Total training time: {elapsed_time}")
 
 
 def train(model, train_loader, criterion, optimizer, device):
     model.train()
-
     for x, y in tqdm(train_loader, desc="Training"):
         x, y = x.to(device), y.to(device)
 
-        output = model(x)
-        loss = criterion(output, y)
+        y_hat = model(x)
 
+        loss = criterion(y_hat, y)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        logger.log_metrics({'loss': loss.item()}, phase='train', aggregate=True, n=x.shape[0])
+        correct = torch.argmax(y_hat, dim=1).eq(y).sum()
+        acc = correct / y.shape[0]
+
+        logger.log_metrics({'loss': loss, 'acc': acc},
+                           phase='train', aggregate=True, n=x.shape[0])
 
 
 @torch.no_grad()
 def validate(model, val_loader, criterion, device):
     model.eval()
-
     for x, y in tqdm(val_loader, desc="Validation"):
         x, y = x.to(device), y.to(device)
 
-        output = model(x)
-        loss = criterion(output, y)
+        y_hat = model(x)
 
-        logger.log_metrics({'val_loss': loss.item()}, phase='val', aggregate=True, n=lead.shape[0])
+        loss = criterion(y_hat, y)
 
-
-def write_summary(*infos):
-    with open(SUMMARY_FILE, 'a') as sf:
-        sf.write(','.join([str(i) for i in infos]) + '\n')
+        correct = torch.argmax(y_hat, dim=1).eq(y).sum()
+        acc = correct / y.shape[0]
+        logger.log_metrics({'val_loss': loss, 'val_acc': acc},
+                           phase='val', aggregate=True, n=x.shape[0])
 
 
 if __name__ == "__main__":
