@@ -8,25 +8,28 @@ from datetime import datetime
 import torch
 import torch.nn as nn
 
-from resnet import ResNet
-from utils.logger import Logger
-from dataloader import CIFAR10
-from utils import load_checkpoint, timer, save_checkpoint
+from models import ResNet
 
-CHECKPOINT_DIR = 'checkpoints'
-LOG_DIR = 'logs'
-TIMESTAMP = datetime.now().strftime('%y-%m-%d_%H%M%S')
+from dataloader import CIFAR10
+
+from utils.logger import Logger
+from utils.helpers import load_checkpoint, timer, save_checkpoint
+
+LOG_DIR = 'runs'
+TIMESTAMP = datetime.now().strftime('%y%m%d_%H-%M-%S')
 SUMMARY_FILE = os.path.join(LOG_DIR, 'models_summary.csv')
 
-parser = argparse.ArgumentParser(description="PyTorch ResNet Training")
+parser = argparse.ArgumentParser(description="PyTorch Model Training")
+parser.add_argument('--model', '-m', default='resnet', choices=['resnet'],
+                    type=str, metavar='NAME', help='Choose model')
 parser.add_argument('--name', '-n', default='',
                     type=str, metavar='NAME', help='Model name and folder where logs are stored')
 parser.add_argument('--epochs', default=2,
                     type=int, metavar='N', help='Number of epochs to run (default: 2)')
-parser.add_argument('--batch-size', default=8, metavar='N',
-                    type=int, help='Mini-batch size (default: 8)')
-parser.add_argument('--lr', default=0.01,
-                    type=float, metavar='LR', help='Initial learning rate (default: 0.01)')
+parser.add_argument('--batch-size', default=16, metavar='N',
+                    type=int, help='Mini-batch size (default: 16)')
+parser.add_argument('--lr', default=0.001,
+                    type=float, metavar='LR', help='Initial learning rate (default: 0.001)')
 parser.add_argument('--config', default='config.yaml',
                     metavar='PATH', help='Path to model config file (default: config.yaml)')
 parser.add_argument('--gpus', default=0, type=int,
