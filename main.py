@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 
 from resnet import ResNet
-from logger import Logger
+from utils.logger import Logger
 from dataloader import CIFAR10
 from utils import load_checkpoint, timer, save_checkpoint
 

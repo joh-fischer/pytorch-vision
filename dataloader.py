@@ -8,7 +8,6 @@ class CIFAR10:
     def __init__(self, batch_size: int = 16):
         """
         Wrapper to load, preprocess and deprocess CIFAR-10 dataset.
-
         Args:
             batch_size (int): Batch size, default: 16.
         """
@@ -43,7 +42,8 @@ class CIFAR10:
         # invert normalization for tensor to image transform
         self.inv_normalize = transforms.Compose([
             transforms.Normalize(mean=0, std=[1./s for s in self.std]),
-            transforms.Normalize(mean=[-m for m in self.mean], std=1.)
+            transforms.Normalize(mean=[-m for m in self.mean], std=1.),
+            lambda x: x*255
         ])
 
     @property
@@ -75,3 +75,27 @@ class CIFAR10:
             return Image.fromarray(img.permute(1, 2, 0).numpy().astype('uint8')).convert("RGB")
         else:
             return Image.fromarray(img[0].numpy()).convert("L")
+
+
+if __name__ == "__main__":
+    data = CIFAR10(batch_size=16)
+
+    for batch in data.train:
+        ims, labels = batch
+
+        print("images")
+        print("\t", ims.shape)
+        print(f"\t {ims.min()} < {torch.mean(ims)} < {ims.max()}")
+        print("labels")
+        print("\t", labels)
+
+        ims = ims.detach().cpu()
+        ims_grid = torchvision.utils.make_grid(ims)
+
+        pil_ims = data.tensor2img(ims_grid)
+        SAVE_DIR = 'datasamples'
+        if not os.path.exists(SAVE_DIR):
+            os.mkdir(SAVE_DIR)
+        pil_ims.save(os.path.join(SAVE_DIR, 'cifar10_sample.png'))
+
+        break
