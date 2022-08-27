@@ -1,0 +1,2 @@
+- use model from args.model
+- test training loop
