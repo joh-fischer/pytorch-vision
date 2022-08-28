@@ -21,6 +21,8 @@ import torch
 import torch.nn as nn
 import einops
 
+#https://towardsdatascience.com/implementing-visualttransformer-in-pytorch-184f9f16f632
+#https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/vit.py
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, input_dim: int, dim: int = 64, n_heads: int = 4):
@@ -61,7 +63,6 @@ class PatchEmbedding(nn.Module):
     def __init__(self, image_size: int, patch_size: int, in_channels: int = 3, dim: int = 64):
         super().__init__()
         assert image_size % patch_size == 0, "Image size must by divisible by patch size!"
-        n_patches = (image_size / patch_size) ** 2
         self.patch_size = patch_size
 
         self.projection = nn.Linear(in_channels * patch_size ** 2, dim)
