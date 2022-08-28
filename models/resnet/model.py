@@ -19,7 +19,7 @@
 # SOFTWARE.
 import torch
 import torch.nn as nn
-from .layers import ResidualBlock
+from models.resnet.layers import ResidualBlock
 
 
 class ResNet(nn.Module):
@@ -71,14 +71,11 @@ class ResNet(nn.Module):
 
 
 if __name__ == "__main__":
-
     img_shape = (3, 32, 32)
     model = ResNet()
 
     img_batch = torch.randn((64, *img_shape))
-
-    print("Input shape:", img_batch.shape)
-    print("forward pass...")
     out = model(img_batch)
 
+    print("Input shape:", img_batch.shape)
     print("Output shape:", out.shape)
