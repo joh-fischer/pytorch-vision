@@ -1,5 +1,14 @@
 import os
 import torch
+import yaml
+from models import ResNet
+
+
+def get_model(name, config):
+    if name == "resnet":
+        return ResNet(**config)
+    else:
+        raise ValueError(f"Model '{name}' not implemented yet!")
 
 
 def timer(start, end):

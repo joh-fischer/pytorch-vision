@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import yaml
 import argparse
@@ -8,15 +9,15 @@ from datetime import datetime
 import torch
 import torch.nn as nn
 
-from models import ResNet
-
 from dataloader import CIFAR10
 
 from utils.logger import Logger
 from utils.helpers import load_checkpoint, timer, save_checkpoint
+from utils.helpers import get_model
+
 
 LOG_DIR = 'runs'
-TIMESTAMP = datetime.now().strftime('%y%m%d_%H-%M-%S')
+TIMESTAMP = datetime.now().strftime('%y%m%d_%H%M%S')
 SUMMARY_FILE = os.path.join(LOG_DIR, 'models_summary.csv')
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification Training")
@@ -66,7 +67,7 @@ def main():
         device = torch.device(f'cuda:{args.gpus[0]}' if torch.cuda.is_available() else 'cpu')
     else:
         raise ValueError('Currently multi-gpu training is not possible')
-    print("{:<18}: {}".format('device', device))
+    print("{:<16}: {}".format('device', device))
 
     # data
     data = CIFAR10(args.batch_size)
@@ -76,8 +77,7 @@ def main():
     if not os.path.exists(cfg_path):
         raise ValueError(f'Model config file "{cfg_path}" does not exist!')
     cfg = yaml.load(open(cfg_path, 'r'), Loader=yaml.Loader)
-    # TODO: load model with args.model
-    model = ResNet(**cfg)
+    model = get_model(args.model, cfg)
     model.to(device)
 
     # loss function and optimizer
@@ -108,15 +108,14 @@ def main():
         validate(model, data.val, criterion, device)
 
         # log to tensorboard
-        logger.tensorboard.add_scalars('Accuracy', {'train_acc': logger.epoch['acc'].avg,
-                                                    'val_acc': logger.epoch['val_acc'].avg}, epoch)
-        logger.tensorboard.add_scalars('Loss', {'train_loss': logger.epoch['loss'].avg,
-                                                'val_loss': logger.epoch['val_loss'].avg}, epoch)
+        logger.tensorboard.add_scalar('Accuracy/train', logger.epoch['acc'].avg, epoch)
+        logger.tensorboard.add_scalar('Accuracy/val', logger.epoch['val_acc'].avg, epoch)
+        logger.tensorboard.add_scalar('Loss/train', logger.epoch['loss'].avg, epoch)
+        logger.tensorboard.add_scalar('Loss/val', logger.epoch['val_loss'].avg, epoch)
 
         # output progress
-        print("\n{:>8}: {:.4f} - {:>8}: {:.4f} - {:>4}: {:.2f} - {:>4}: {:.2f}".format(
-            'loss', logger.epoch['loss'].avg, 'val_loss', logger.epoch['val_loss'].avg,
-            'acc', 100. * logger.epoch['acc'].avg, 'val_acc', 100. * logger.epoch['val_acc'].avg))
+        print(f"{'loss':>8}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
+              f"{'acc':>4}: {logger.epoch['acc'].avg:.4f} - {'val_acc':>4}: {logger.epoch['val_acc'].avg:.4f}")
 
         # save logs and checkpoint
         if (epoch + 1) % args.save_interval == 0 or (epoch + 1) == args.epochs:
@@ -164,4 +163,9 @@ def validate(model, val_loader, criterion, device):
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Exit training with keyboard interrupt!")
+        logger.save()
+        sys.exit(0)

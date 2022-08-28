@@ -4,3 +4,4 @@ tensorboard
 pyyaml
 tqdm
 pillow
+einops
