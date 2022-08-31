@@ -6,6 +6,10 @@ Implementing CIFAR10 Residual Network ([He et al., 2016](https://arxiv.org/abs/1
 
 Please ensure that you're using Python version 3.9 or above.
 
+## Networks
+- DenseNet
+- ResNet with CBAM
+
 ## Todo
 - compare different network width and depth
 - tensorboard
