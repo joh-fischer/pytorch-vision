@@ -1,4 +1,4 @@
-# ResNet Implementation
+# Image Classification Models
 
 Implementing CIFAR10 Residual Network ([He et al., 2016](https://arxiv.org/abs/1512.03385)]) in PyTorch.
 
