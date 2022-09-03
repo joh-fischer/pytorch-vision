@@ -1,3 +1,0 @@
-- ViT
-- Simple ViT
-- Dense Net
