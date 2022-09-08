@@ -1,43 +1,36 @@
 # Image Classification Models
 
-Implementing CIFAR10 Residual Network ([He et al., 2016](https://arxiv.org/abs/1512.03385)]) in PyTorch.
+Implementation of a few CIFAR10 image classification models in PyTorch.
+
+**TODO**:
+* describe data preprocessing
+* learning rate decay
+* describe custom logger
+* tensorboard support
+* how to start from checkpoint
+
+## ResNet
+
+He et al. ([2016](https://arxiv.org/abs/1512.03385)) introduce skip connections ...
+
+Implementation of residual networks with the same architecture
+
+```python
+import torch
+from models import ResNet
+
+x = torch.randn((16, 3, 32, 32))
+
+model = ResNet()
+
+model(x).shape      # 
+```
+
+## ViT ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929))
+
 
 ## Usage
 
-Please ensure that you're using Python version 3.9 or above.
-
-## Todo
-- compare different network width and depth
-- tensorboard
-  - visualize examples and assigned class probabilities
-  - writer.add_fig(...)
-- GPU access
-  - multiple GPU support
-  - to(device)
-- progress bar as wright
-- maybe make improved ResNet
-  - use swish activation function
-  - learning rate decay (first high, then low)
-  - 7x7 decomposed into three 3x3 convs (ref literature)
-- training
-  - learning rate of 0.1 
-  - divide by 10 at 32k and 48k iterations
-  - end training after 64k iterations
-  - batch size 128
-
-
-## Description
-- architecture as in ResNet paper for CIFAR-10
-  - filters (16, 32, ...)
-  - avgpool2d (GAP)
-- Custom Logger
-- TensorBoard support
-- describe config file
-- data preprocessing
-  - per pixel mean subtracted
-  - 4 pixel padding and center crop
-  - horizontal flip
-- start from checkpoint with dict -> state_dict, epoch, ...
 
 
 ## Links
