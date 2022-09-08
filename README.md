@@ -19,14 +19,16 @@ Implementation of residual networks with the same architecture
 import torch
 from models import ResNet
 
-x = torch.randn((16, 3, 32, 32))
+x = torch.randn((64, 3, 32, 32))
 
 model = ResNet()
-
-model(x).shape      # 
+model(x).shape      # [64, 10] 
 ```
 
-## ViT ([Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929))
+## ViT
+
+Dosovitskiy et al. ([2020](https://arxiv.org/abs/2010.11929)) propose the Vision Transformer (ViT)
+
 
 
 ## Usage
