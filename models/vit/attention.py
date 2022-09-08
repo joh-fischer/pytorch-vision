@@ -46,11 +46,11 @@ class MultiHeadAttention(nn.Module):
         qkv = self.to_qkv(x)
         q, k, v = einops.rearrange(qkv, 'b t (qkv h d) -> qkv b h t d', qkv=3, d=self.dim)     # [bs, h, t, d]
 
-        dot = torch.einsum('bhtd, bhkd -> bhtk', q, k) * self.scale     # [bs, h, t, t]
+        dot = torch.einsum('b h t d, b h k d -> b h t k', q, k) * self.scale     # [bs, h, t, t]
 
         att = torch.softmax(dot, dim=-1)
 
-        out = torch.einsum('bhdt, bhtv -> bhdv', att, v)
+        out = torch.einsum('b h d t, b h t v -> b h d v', att, v)
         out = einops.rearrange(out, 'b h t d -> b t (h d)')
         out = self.unify_heads(out)
 
@@ -60,5 +60,6 @@ class MultiHeadAttention(nn.Module):
 if __name__ == "__main__":
     ipt = torch.randn((8, 17, 64))
     mha = MultiHeadAttention(64)
-    print("attention in:", ipt.shape)           # torch.Size([8, 17, 64])
-    print("attention out:", mha(ipt).shape)     # torch.Size([8, 17, 64])
+
+    print("in:", ipt.shape)           # torch.Size([8, 17, 64])
+    print("out:", mha(ipt).shape)     # torch.Size([8, 17, 64])

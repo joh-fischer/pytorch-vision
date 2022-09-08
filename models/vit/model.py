@@ -20,13 +20,48 @@
 import torch
 import torch.nn as nn
 
-from .embedding import PatchEmbedding
-from .transformer import TransformerBlock
+from models.vit.embedding import PatchEmbedding
+from models.vit.transformer import TransformerBlock
 
 
 class ViT(nn.Module):
-    def __init__(self):
+    def __init__(self,
+                 patch_size: int = 8, depth: int = 16,
+                 image_size: int = 32, in_channels: int = 3, n_classes: int = 10,
+                 dim: int = 64, n_heads: int = 4, dropout: float = 0.):
         super().__init__()
 
+        # patch embeddings
+        self.embedding = PatchEmbedding(image_size, patch_size, in_channels, dim)
+
+        # transformer encoder
+        self.transformer = nn.ModuleList([
+            TransformerBlock(dim, n_heads, dropout)
+            for _ in range(depth)
+        ])
+
+        # classification head
+        self.head = nn.Sequential(
+            nn.Linear(dim, n_classes)
+        )
+
     def forward(self, x: torch.Tensor):
-        pass
+        x = self.embedding(x)
+
+        for tr in self.transformer:
+            x = tr(x)
+
+        # just take the class token
+        x = x[:, 0]
+
+        x = self.head(x)
+
+        return x
+
+
+if __name__ == "__main__":
+    ipt = torch.randn((8, 3, 32, 32))
+    vit = ViT(depth=8)
+
+    print("image in:", ipt.shape)               # torch.Size([8, 3, 32, 32])
+    print("vit out:", vit(ipt).shape)    # torch.Size([8, 17, 64])
