@@ -40,7 +40,7 @@ class PatchEmbedding(nn.Module):
         assert image_size % patch_size == 0, "Image size must by divisible by patch size!"
 
         self.patch_size = patch_size
-        self.projection = nn.Linear(in_channels * patch_size ** 2, dim)
+        self.projection = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size, bias=False)
 
         # class token
         self.class_token = nn.Parameter(torch.randn(1, 1, dim))
@@ -52,9 +52,12 @@ class PatchEmbedding(nn.Module):
     def forward(self, x: torch.Tensor):
         bs = x.shape[0]
 
-        # patchify images: H x W x C -> N x (P² * C)
-        x = einops.rearrange(x, 'b c (h k) (w i) -> b (h w) (k i c)', k=self.patch_size, i=self.patch_size)
+        # In the paper they first patchify the image and then linearly map
+        # it to a lower dimensional space. This is equivalent to first apply
+        # a convolution with kernel_size = stride = patch_size and then
+        # reshape it. Both result in: H x W x C -> N x (P² * C).
         x = self.projection(x)
+        x = einops.rearrange(x, 'b d h w -> b (h w) d')
 
         # prepend class token
         batched_class_token = einops.repeat(self.class_token, '1 1 d -> b 1 d', b=bs)
@@ -69,5 +72,6 @@ class PatchEmbedding(nn.Module):
 if __name__ == "__main__":
     ipt = torch.randn((8, 3, 32, 32))
     patchify = PatchEmbedding(image_size=32, patch_size=8)
+
     print("image in:", ipt.shape)               # torch.Size([8, 3, 32, 32])
     print("patch emb:", patchify(ipt).shape)    # torch.Size([8, 17, 64])
