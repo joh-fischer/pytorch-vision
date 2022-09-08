@@ -38,3 +38,12 @@ def save_checkpoint(model, ckpt_dir, logger):
     filename = os.path.join(ckpt_dir, f'e{epoch + 1}.pt')
     print(f"Save checkpoint to '{filename}'")
     torch.save(state, filename)
+
+
+def count_parameters(model, return_int: bool = False):
+    n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+    if return_int:
+        return n_params
+
+    return f'{n_params:,}'
