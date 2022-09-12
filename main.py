@@ -16,7 +16,7 @@ from utils.helpers import get_model
 
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification Training")
-parser.add_argument('--model', '-m', default='resnet', choices=['resnet', 'vit'],
+parser.add_argument('model', default='resnet', choices=['resnet', 'vit'],
                     type=str, metavar='NAME', help='Choose model')
 parser.add_argument('--name', '-n', default=None,
                     type=str, metavar='NAME', help='Model name and folder where logs are stored')
