@@ -51,7 +51,7 @@ class Dummy:
 
 class Logger:
     def __init__(self, log_dir: str = 'logs', exp_name: str = None, timestamp: bool = False,
-                 tensorboard: bool = False):
+                 tensorboard: bool = False, create_folder: bool = True):
         """
         Custom logger for PyTorch training loops.
 
@@ -71,12 +71,14 @@ class Logger:
             timestamp format is `y-m-d_HMS`, e.g. 22-07-07_121028.
                 tensorboard : bool
             If true, creates a `SummaryWriter` instance to write to tensorboard.
+        create_folder : bool
+            If true, creates a folder for saving the logs.
         """
         self.exp_name = exp_name if exp_name else ''
         self.timestamp = datetime.now().strftime('%y-%m-%d_%H%M%S') if timestamp else ''
         self.log_dir = os.path.join(log_dir, self.exp_name, self.timestamp)
 
-        if not os.path.exists(self.log_dir):
+        if not os.path.exists(self.log_dir) and create_folder:
             os.makedirs(self.log_dir, exist_ok=True)
 
         self.writer = SummaryWriter(self.log_dir) if tensorboard else Dummy()

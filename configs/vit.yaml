@@ -1,0 +1,9 @@
+# config file for ViT
+in_channels: 3
+patch_size: 8
+image_size: 32  # size of input image
+depth: 16       # depth of transformer encoder
+n_classes: 10   # number of output classes
+dim: 64         # dimension of q,k,v
+n_heads: 4      # number of heads for multi-headed self-attention
+dropout: 0.     # dropout rate for transformer encoder

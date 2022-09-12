@@ -1,12 +1,13 @@
 import os
 import torch
-import yaml
-from models import ResNet
+from models import ResNet, ViT
 
 
 def get_model(name, config):
     if name == "resnet":
         return ResNet(**config)
+    if name == "vit":
+        return ViT(**config)
     else:
         raise ValueError(f"Model '{name}' not implemented yet!")
 
@@ -35,7 +36,7 @@ def save_checkpoint(model, ckpt_dir, logger):
     state = {'epoch': epoch, 'model_state_dict': model.state_dict(),
              'loss': logger.epoch['loss'].avg, 'val_loss': logger.epoch['val_loss'].avg,
              'acc': logger.epoch['acc'].avg, 'val_acc': logger.epoch['val_acc'].avg}
-    filename = os.path.join(ckpt_dir, f'e{epoch + 1}.pt')
+    filename = os.path.join(ckpt_dir, 'ckpt.pt')
     print(f"Save checkpoint to '{filename}'")
     torch.save(state, filename)
 

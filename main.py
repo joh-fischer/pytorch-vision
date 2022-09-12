@@ -4,7 +4,6 @@ import time
 import yaml
 import argparse
 from tqdm import tqdm
-from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -16,14 +15,10 @@ from utils.helpers import load_checkpoint, timer, save_checkpoint
 from utils.helpers import get_model
 
 
-LOG_DIR = 'runs'
-TIMESTAMP = datetime.now().strftime('%y%m%d_%H%M%S')
-SUMMARY_FILE = os.path.join(LOG_DIR, 'models_summary.csv')
-
 parser = argparse.ArgumentParser(description="PyTorch Image Classification Training")
-parser.add_argument('--model', '-m', default='resnet', choices=['resnet'],
+parser.add_argument('--model', '-m', default='resnet', choices=['resnet', 'vit'],
                     type=str, metavar='NAME', help='Choose model')
-parser.add_argument('--name', '-n', default='',
+parser.add_argument('--name', '-n', default=None,
                     type=str, metavar='NAME', help='Model name and folder where logs are stored')
 parser.add_argument('--epochs', default=2,
                     type=int, metavar='N', help='Number of epochs to run (default: 2)')
@@ -36,30 +31,23 @@ parser.add_argument('--gpus', default=0, type=int,
 parser.add_argument('--ckpt-save', default=True, action=argparse.BooleanOptionalAction,
                     dest='save_checkpoint', help='Save checkpoints to folder')
 parser.add_argument('--load-ckpt', default=None, metavar='PATH',
-                    dest='load_checkpoint', help='Load model checkpoint and continue training')
+                    dest='load_checkpoint', help='Load model checkpoint and train/evaluate.')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='Evaluate model on test set')
 parser.add_argument('--log-save-interval', default=5, type=int, metavar='N',
                     dest='save_interval', help="Interval in which logs are saved to disk (default: 5)")
 
+
+LOG_DIR = 'runs'
 logger = Logger(LOG_DIR)
 
 
 def main():
+    global logger
+
     args = parser.parse_args()
     for name, val in vars(args).items():
         print("{:<16}: {}".format(name, val))
-
-    # setup paths and logging
-    running_log_dir = os.path.join(LOG_DIR, args.model, args.name, f'{TIMESTAMP}')
-    running_ckpt_dir = os.path.join(running_log_dir, 'checkpoints')
-    print("{:<16}: {}".format('logdir', running_log_dir))
-    print("{:<16}: {}".format('ckpt_dir', running_ckpt_dir))
-
-    global logger
-    logger = Logger(running_log_dir, tensorboard=True)
-    if args.save_checkpoint and not os.path.exists(running_ckpt_dir):
-        os.makedirs(running_ckpt_dir)
 
     # GPU
     args.gpus = args.gpus if isinstance(args.gpus, list) else [args.gpus]
@@ -91,14 +79,21 @@ def main():
         start_epoch = 0
 
     if args.evaluate:
+        logger = Logger(tensorboard=False, create_folder=False)
         logger.init_epoch()
         validate(model, data.val, criterion, device)
         print("\n{:>8}: {:.4f} - {:>8}: {:.4f}".format('val_loss', logger.epoch['val_loss'].avg,
                                                        'val_acc', 100. * logger.epoch['val_acc'].avg))
         return
 
-    # start run
+    # setup paths and logging
+    exp_name = args.model + '_' + args.name if args.name is not None else args.model
+    running_log_dir = os.path.join(LOG_DIR, exp_name)
+    print("{:<16}: {}".format('logdir', running_log_dir))
+    logger = Logger(running_log_dir, tensorboard=True)
     logger.log_hparams({**cfg, **vars(args)})
+
+    # start run
     t_start = time.time()
     for epoch in range(start_epoch, args.epochs):
         logger.init_epoch(epoch)
@@ -121,7 +116,7 @@ def main():
         if (epoch + 1) % args.save_interval == 0 or (epoch + 1) == args.epochs:
             logger.save()
             if args.save_checkpoint:
-                save_checkpoint(model, running_ckpt_dir, logger)
+                save_checkpoint(model, running_log_dir, logger)
 
     elapsed_time = timer(t_start, time.time())
     print(f"Total training time: {elapsed_time}")
