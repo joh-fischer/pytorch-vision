@@ -64,4 +64,4 @@ if __name__ == "__main__":
     vit = ViT(depth=8)
 
     print("image in:", ipt.shape)               # torch.Size([8, 3, 32, 32])
-    print("vit out:", vit(ipt).shape)    # torch.Size([8, 17, 64])
+    print("vit out:", vit(ipt).shape)           # torch.Size([8, 10])

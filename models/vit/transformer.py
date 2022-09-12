@@ -61,7 +61,7 @@ class TransformerBlock(nn.Module):
 
 
 if __name__ == "__main__":
-    ipt = torch.randn((8, 16, 64))
+    ipt = torch.randn((8, 17, 64))
     tblock = TransformerBlock()
-    print("transformer block in:", ipt.shape)             # torch.Size([8, 16, 64])
-    print("transformer block out:", tblock(ipt).shape)    # torch.Size([8, 16, 64])
+    print("transformer block in:", ipt.shape)             # torch.Size([8, 17, 64])
+    print("transformer block out:", tblock(ipt).shape)    # torch.Size([8, 17, 64])
