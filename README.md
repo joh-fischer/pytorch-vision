@@ -5,10 +5,13 @@ Implementation of a few CIFAR-10 image classification models in PyTorch.
 
 ## Results
 
-|                   Paper                    |         Code          | Epochs | Accuracy |
-|:------------------------------------------:|:---------------------:|:------:|:--------:|
-| [ResNet](https://arxiv.org/abs/1512.03385) | [here](models/resnet) |   20   |  95.2%   |
-|  [ViT](https://arxiv.org/abs/2010.11929)   |  [here](models/vit)   |   20   |  94.4%   |    
+Each model is trained for 20 epochs with learning rate 0.001 and Adam optimizer on a GTX 1050 Ti gpu.
+
+
+|                   Paper                    |          Code           | Params | Accuracy |
+|:------------------------------------------:|:-----------------------:|:------:|:--------:|
+| [ResNet](https://arxiv.org/abs/1512.03385) | [resnet](models/resnet) |   175,594   |  95.2%   |
+|  [ViT](https://arxiv.org/abs/2010.11929)   |    [vit](models/vit)    |   1,200,906   |  94.4%   |    
 
 ## Usage
 
