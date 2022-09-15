@@ -1,6 +1,6 @@
 import os
 import torch
-from models import ResNet, ViT
+from models import ResNet, ViT, HierarchicalPerceiver
 
 
 def get_model(name, config):
@@ -9,7 +9,7 @@ def get_model(name, config):
     if name == "vit":
         return ViT(**config)
     if name == "hip":
-        return
+        return HierarchicalPerceiver(**config)
     else:
         raise ValueError(f"Model '{name}' not implemented yet!")
 
