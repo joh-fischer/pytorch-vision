@@ -7,13 +7,13 @@ Implementation of a few CIFAR-10 image classification models in PyTorch.
 
 Results of some model trainings. Each model is trained with Adam optimizer and batch size
 of 128. Please note, that the reported accuracies are far from what is possible with
-those models, as I don't finetune them at all. ;)
+those models. I just train them for a couple of epochs and don't finetune them at all. ;)
 
 
 |                           Paper                            |          Code           |  Params   | Accuracy |
 |:----------------------------------------------------------:|:-----------------------:|:---------:|:--------:|
 |         [ResNet](https://arxiv.org/abs/1512.03385)         | [resnet](models/resnet) |  175,594  |  95.2%   |
-|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    | 1,200,906 |  94.4%   |
+|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    | 1,200,906 |  60.7%   |
 | [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 4,520,970 |  52.6%   |
 
 ## Usage
@@ -71,3 +71,9 @@ model = HierarchicalPerceiver(**cfg)
 x = torch.randn((64, 3, 32, 32))
 model(x).shape      # [64, 10] 
 ```
+
+For this implementation I used standard 2D sinusoidal instead of learned positional embeddings. Furthermore, I only
+train on classification with the HiP encoder. However, you can add the decoder simply by editing the
+config file of the HiP (add some more blocks with decreasing `latent_dim` and increasing sequence length). Then
+the proposed masked auto-encoder pre-training ([MAE](https://arxiv.org/abs/2111.06377)) is quite
+straight-forward.
