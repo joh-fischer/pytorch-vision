@@ -24,7 +24,7 @@ You can train a model with
 python3 main.py resnet --name exp1 --epochs 2
 ```
 
-A list of supported models can be found in the results section (column *code*).
+A list of supported models can be found in the results section (*code* column).
 
 ### ResNet
 
