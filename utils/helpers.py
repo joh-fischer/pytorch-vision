@@ -8,6 +8,8 @@ def get_model(name, config):
         return ResNet(**config)
     if name == "vit":
         return ViT(**config)
+    if name == "hip":
+        return
     else:
         raise ValueError(f"Model '{name}' not implemented yet!")
 
