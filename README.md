@@ -1,6 +1,6 @@
 # Image Classification Models
 
-Implementation of a few vision models in PyTorch. 
+Implementation of a few popular vision models in PyTorch. 
 
 
 ## Results
