@@ -56,7 +56,7 @@ model(x).shape      # [64, 10]
 
 ### Hierarchical Perceiver
 
-Carreira et al. ([2022](https://arxiv.org/abs/2202.10890)) improve the efficiency of Perceiver models
+Carreira et al. ([2022](https://arxiv.org/abs/2202.10890)) improve the efficiency the Perceiver
 by making it hierarchical. For that, the authors divide the input sequence into groups and independently
 apply cross- and self-attention to those groups.
 
