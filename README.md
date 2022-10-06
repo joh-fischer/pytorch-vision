@@ -56,7 +56,7 @@ model(x).shape      # [64, 10]
 
 ### Hierarchical Perceiver
 
-Carreira et al. ([2022](https://arxiv.org/abs/2202.10890)) improve the efficiency the Perceiver
+Carreira et al. ([2022](https://arxiv.org/abs/2202.10890)) improve the efficiency of the Perceiver
 by making it hierarchical. For that, the authors propose the HiP-Block which divides the input
 sequence into groups and independently applies cross- and self-attention to those groups. Stacking
 multiple of those blocks results in the respective hierarchy.
