@@ -30,8 +30,8 @@ parser.add_argument('--gpus', default=0, type=int, nargs='+', metavar='GPUS',
                     help='If GPU(s) available, which GPU(s) to use for training.')
 
 # learning rate stuff
-parser.add_argument('--lr', default=0.0001, type=float, metavar='LR',
-                    help='Initial learning rate (default: 0.0001)')
+parser.add_argument('--lr', default=0.001, type=float, metavar='LR',
+                    help='Initial learning rate (default: 0.001)')
 parser.add_argument('--use-scheduler', default=True, action=argparse.BooleanOptionalAction,
                     help='Whether to use a cosine scheduler with linear warmup or not.')
 parser.add_argument('--min-lr', type=float, default=1e-6, metavar='LR',
