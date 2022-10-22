@@ -16,6 +16,7 @@ from utils.helpers import load_checkpoint, timer, save_checkpoint
 from utils.helpers import get_model
 from utils.scheduler import cosine_scheduler
 
+# python3 main.py hip --name run0 --epochs 60 --batch-size 256 --gpus 7 --warmup-epochs 10
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification")
 parser.add_argument('model', choices=['resnet', 'vit', 'hip'], type=str, metavar='NAME',
@@ -113,8 +114,8 @@ def main():
         return
 
     # setup paths and logging
-    exp_name = args.model + '_' + args.name if args.name is not None else args.model
-    running_log_dir = os.path.join(LOG_DIR, exp_name)
+    exp_dir = os.path.join(args.model, args.name) if args.name is not None else args.model
+    running_log_dir = os.path.join(LOG_DIR, exp_dir)
     print("{:<16}: {}".format('logdir', running_log_dir))
     logger = Logger(running_log_dir, tensorboard=True)
     logger.log_hparams({**cfg, **vars(args)})
