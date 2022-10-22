@@ -136,7 +136,7 @@ def main():
 
         # output progress
         print(f"{'global step':>8}: {logger.global_train_step} | "
-              f"{'loss':>8}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
+              f"{'loss':>5}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
               f"{'acc':>4}: {logger.epoch['acc'].avg:.4f} - {'val_acc':>4}: {logger.epoch['val_acc'].avg:.4f}")
 
         # save logs and checkpoint
