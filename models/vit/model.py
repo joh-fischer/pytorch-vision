@@ -26,9 +26,15 @@ from models.vit.transformer import TransformerBlock
 
 class ViT(nn.Module):
     def __init__(self,
-                 patch_size: int = 8, depth: int = 16,
-                 image_size: int = 32, in_channels: int = 3, n_classes: int = 10,
-                 dim: int = 64, n_heads: int = 4, dropout: float = 0.):
+                 image_size: int = 32,
+                 in_channels: int = 3,
+                 n_classes: int = 10,
+                 patch_size: int = 8,
+                 depth: int = 16,
+                 dim: int = 64,
+                 heads: int = 4,
+                 dim_head: int = 32,
+                 dropout: float = 0.):
         super().__init__()
 
         # patch embeddings
@@ -36,7 +42,7 @@ class ViT(nn.Module):
 
         # transformer encoder
         self.transformer = nn.ModuleList([
-            TransformerBlock(dim, n_heads, dropout)
+            TransformerBlock(dim, dim_head, heads, dropout)
             for _ in range(depth)
         ])
 

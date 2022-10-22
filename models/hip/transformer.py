@@ -36,10 +36,11 @@ class TransformerBlock(nn.Module):
             widening_factor: MLP hidden dim widening factor (default: 4).
         """
         super().__init__()
+        self.norm1 = nn.LayerNorm(dim)
         self.attn = SelfAttention(dim, dim_head, heads)
 
+        self.norm2 = nn.LayerNorm(dim)
         self.mlp = nn.Sequential(
-            nn.LayerNorm(dim),
             nn.Linear(dim, dim * widening_factor),
             nn.GELU(),
             nn.Dropout(dropout),
@@ -48,8 +49,13 @@ class TransformerBlock(nn.Module):
         )
 
     def forward(self, x: torch.Tensor):
-        x = self.attn(x) + x
-        x = self.mlp(x) + x
+        residual = x
+        x = self.norm1(x)
+        x = self.attn(x) + residual
+
+        residual = x
+        x = self.norm2(x)
+        x = self.mlp(x) + residual
 
         return x
 

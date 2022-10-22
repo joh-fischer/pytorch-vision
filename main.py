@@ -22,8 +22,8 @@ parser.add_argument('--name', '-n', default=None,
                     type=str, metavar='NAME', help='Model name and folder where logs are stored')
 parser.add_argument('--epochs', default=2,
                     type=int, metavar='N', help='Number of epochs to run (default: 2)')
-parser.add_argument('--batch-size', default=16, metavar='N',
-                    type=int, help='Mini-batch size (default: 16)')
+parser.add_argument('--batch-size', default=64, metavar='N',
+                    type=int, help='Mini-batch size (default: 64)')
 parser.add_argument('--lr', default=0.0001,
                     type=float, metavar='LR', help='Initial learning rate (default: 0.001)')
 parser.add_argument('--gpus', default=0, type=int,
