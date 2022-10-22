@@ -24,44 +24,38 @@ from models.hip.attention import SelfAttention
 
 
 class TransformerBlock(nn.Module):
-    def __init__(self, dim: int = 64, n_heads: int = 4, dropout: float = 0.):
+    def __init__(self, dim: int, dim_head: int = 32, heads: int = 4,
+                 dropout: float = 0., widening_factor: int = 4):
         """
         Transformer Encoder block as described in https://arxiv.org/abs/2010.11929.
-
         Args:
             dim: Input dimension of transformer block.
-            n_heads: Number of heads for attention.
+            dim_head: Dimension of keys, queries, values per head.
+            heads: Number of heads for attention.
             dropout: p for dropout layers (default: 0).
+            widening_factor: MLP hidden dim widening factor (default: 4).
         """
         super().__init__()
-        self.norm1 = nn.LayerNorm(dim)
-        self.attn = SelfAttention(dim, dim, n_heads)
+        self.attn = SelfAttention(dim, dim_head, heads)
 
-        self.norm2 = nn.LayerNorm(dim)
         self.mlp = nn.Sequential(
-            nn.Linear(dim, dim),
+            nn.LayerNorm(dim),
+            nn.Linear(dim, dim * widening_factor),
             nn.GELU(),
             nn.Dropout(dropout),
-            nn.Linear(dim, dim),
+            nn.Linear(dim * widening_factor, dim),
             nn.Dropout(dropout)
         )
 
     def forward(self, x: torch.Tensor):
-        residual = x
-        x = self.norm1(x)
-        x = self.attn(x)
-        x += residual
-
-        residual = x
-        x = self.norm2(x)
-        x = self.mlp(x)
-        x += residual
+        x = self.attn(x) + x
+        x = self.mlp(x) + x
 
         return x
 
 
 if __name__ == "__main__":
     ipt = torch.randn((8, 16, 64))
-    tblock = TransformerBlock()
+    tblock = TransformerBlock(64)
     print("transformer block in:", ipt.shape)             # torch.Size([8, 16, 64])
     print("transformer block out:", tblock(ipt).shape)    # torch.Size([8, 16, 64])

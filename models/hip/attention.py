@@ -23,7 +23,7 @@ import einops
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, input_dim: int, dim: int = 64, heads: int = 4,
+    def __init__(self, input_dim: int, dim_head: int = 32, heads: int = 4,
                  cross_attn: bool = False):
         """
         Multi-head attention module as described in "Attention Is All
@@ -31,24 +31,24 @@ class MultiHeadAttention(nn.Module):
 
         Args:
             input_dim: Dimension of input.
-            dim: Dimension of keys, queries, values.
+            dim_head: Dimension of keys, queries, values per head.
             heads: Number of heads.
             cross_attn: If true, applies cross-attention. Otherwise,
-                it is normal self-attention.
+                it is standard self-attention.
         """
         super().__init__()
 
         self.heads = heads
-        self.scale = dim ** -0.5
+        self.scale = dim_head ** -0.5
 
-        latent_dim = dim if cross_attn else input_dim
+        latent_dim = dim_head * heads if cross_attn else input_dim
 
-        self.to_q = nn.Linear(latent_dim, dim * heads, bias=False)
+        self.to_q = nn.Linear(latent_dim, dim_head * heads, bias=False)
 
-        self.to_k = nn.Linear(input_dim, dim * heads, bias=False)
-        self.to_v = nn.Linear(input_dim, dim * heads, bias=False)
+        self.to_k = nn.Linear(input_dim, dim_head * heads, bias=False)
+        self.to_v = nn.Linear(input_dim, dim_head * heads, bias=False)
 
-        self.unify_heads = nn.Linear(dim * heads, latent_dim)
+        self.unify_heads = nn.Linear(dim_head * heads, latent_dim)
 
     def forward(self, x: torch.Tensor, latents: torch.Tensor = None):
         k = self.to_k(x)
@@ -73,10 +73,10 @@ class MultiHeadAttention(nn.Module):
 
 
 class SelfAttention(nn.Module):
-    def __init__(self, input_dim: int, dim: int = 64, heads: int = 4):
+    def __init__(self, input_dim: int, dim_head: int = 32, heads: int = 8):
         super().__init__()
 
-        self.attn = MultiHeadAttention(input_dim, dim, heads)
+        self.attn = MultiHeadAttention(input_dim, dim_head, heads)
 
     def forward(self, x: torch.Tensor):
         return self.attn(x)
@@ -85,12 +85,14 @@ class SelfAttention(nn.Module):
 class CrossAttention(nn.Module):
     def __init__(self, input_dim: int, latent_dim: int, heads: int = 8):
         """
-        Applies cross attention between latent and input array as
+        Applies cross-attention between latent and input array as
         described in https://arxiv.org/abs/2103.03206.
+        The `latent_dim` is the total latent dimension over all heads.
         """
         super().__init__()
-
-        self.attn = MultiHeadAttention(input_dim, latent_dim, heads, cross_attn=True)
+        assert latent_dim % heads == 0, "Latent dim must be divisible by number of heads!"
+        dim_head = latent_dim // heads
+        self.attn = MultiHeadAttention(input_dim, dim_head, heads, cross_attn=True)
 
     def forward(self, x: torch.Tensor, latents: torch.Tensor):
         """
@@ -107,19 +109,18 @@ if __name__ == "__main__":
     bs = 32
 
     print("Self-Attention")
-    ipt = torch.randn((bs, 16, 64))
-    sa = SelfAttention(64, 128)
-    print("\tin:", ipt.shape)             # torch.Size([bs, 16, 64])
-    print("\tout:", sa(ipt).shape)        # torch.Size([bs, 16, 64])
+    ipt = torch.randn((bs, 16, 128))
+    sa = SelfAttention(128)
+    print("\tin:", ipt.shape)             # torch.Size([bs, 16, 128])
+    print("\tout:", sa(ipt).shape)        # torch.Size([bs, 16, 128])
 
     print("Cross-Attention")
     groups = 4
-    K, D = (128, 128)
+    K, D = (256, 128)
     lat = torch.randn((groups, K, D))
-
     M, C = (1024, 3)
     ipt = torch.randn((bs, groups, M // groups, C))
-    ca = CrossAttention(C, D, heads=6)
-    print("\tlatents:", lat.shape)          # torch.Size([4, 128, 128])
-    print("\tin:", ipt.shape)               # torch.Size([32, 4, 256, 3])
-    print("\tout:", ca(ipt, lat).shape)     # torch.Size([32, 4, 128, 128])
+    ca = CrossAttention(C, D, heads=8)
+    print("\tlatents:", lat.shape)          # torch.Size([4, 256, 128])
+    print("\tin:", ipt.shape)               # torch.Size([bs, 4, 256, 3])
+    print("\tout:", ca(ipt, lat).shape)     # torch.Size([bs, 4, 128, 128])

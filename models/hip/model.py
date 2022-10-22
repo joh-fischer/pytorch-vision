@@ -44,7 +44,7 @@ class HierarchicalPerceiver(nn.Module):
         self.projection = nn.Linear(in_channels, start_dim)
 
         # positional embedding
-        self.pos_embed = PosEmbedding2d(start_dim, image_size, image_size, mlp=True)
+        self.pos_embed = PosEmbedding2d(start_dim, image_size, image_size)
 
         self.encoder_blocks = nn.ModuleList([
             HiPBlock(**block_cfg)
