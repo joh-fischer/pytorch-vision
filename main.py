@@ -15,27 +15,27 @@ from utils.helpers import load_checkpoint, timer, save_checkpoint
 from utils.helpers import get_model
 
 
-parser = argparse.ArgumentParser(description="PyTorch Image Classification Training")
-parser.add_argument('model', choices=['resnet', 'vit', 'hip'],
-                    type=str, metavar='MODEL', help='Choose model')
-parser.add_argument('--name', '-n', default=None,
-                    type=str, metavar='NAME', help='Model name and folder where logs are stored')
-parser.add_argument('--epochs', default=2,
-                    type=int, metavar='N', help='Number of epochs to run (default: 2)')
-parser.add_argument('--batch-size', default=16, metavar='N',
-                    type=int, help='Mini-batch size (default: 16)')
-parser.add_argument('--lr', default=0.0001,
-                    type=float, metavar='LR', help='Initial learning rate (default: 0.001)')
-parser.add_argument('--gpus', default=0, type=int,
-                    nargs='+', metavar='GPUS', help='If GPU(s) available, which GPU(s) to use for training.')
-parser.add_argument('--ckpt-save', default=True, action=argparse.BooleanOptionalAction,
-                    dest='save_checkpoint', help='Save checkpoints to folder')
-parser.add_argument('--load-ckpt', default=None, metavar='PATH',
-                    dest='load_checkpoint', help='Load model checkpoint and train/evaluate.')
+parser = argparse.ArgumentParser(description="PyTorch Image Classification")
+parser.add_argument('model', choices=['resnet', 'vit', 'hip'], type=str, metavar='NAME',
+                    help='Choose model')
+parser.add_argument('--name', '-n', default=None, type=str, metavar='NAME',
+                    help='Experiment name and folder where logs are stored')
+parser.add_argument('--epochs', default=2, type=int, metavar='N',
+                    help='Number of epochs to run (default: 2)')
+parser.add_argument('--batch-size', default=64, metavar='N', type=int,
+                    help='Mini-batch size (default: 64)')
+parser.add_argument('--lr', default=0.0001, type=float, metavar='LR',
+                    help='Initial learning rate (default: 0.001)')
+parser.add_argument('--gpus', default=0, type=int, nargs='+', metavar='GPUS',
+                    help='If GPU(s) available, which GPU(s) to use for training.')
+parser.add_argument('--ckpt-save', default=False, action=argparse.BooleanOptionalAction, dest='save_checkpoint',
+                    help='Save checkpoints to folder')
+parser.add_argument('--load-ckpt', default=None, metavar='PATH', dest='load_checkpoint',
+                    help='Load model checkpoint and train/evaluate.')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='Evaluate model on test set')
-parser.add_argument('--log-save-interval', default=5, type=int, metavar='N',
-                    dest='save_interval', help="Interval in which logs are saved to disk (default: 5)")
+parser.add_argument('--log-save-interval', default=5, type=int, metavar='N', dest='save_interval',
+                    help="Interval in which logs are saved to disk (default: 5)")
 
 
 LOG_DIR = 'runs'

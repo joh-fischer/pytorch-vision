@@ -2,6 +2,7 @@ import os
 import torch
 import torchvision
 import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
 from PIL import Image
 
 
@@ -34,11 +35,11 @@ class CIFAR10:
 
         self.train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
                                                       transform=self.train_transform)
-        self.train_loader = torch.utils.data.DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True)
+        self.train_loader = DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True)
 
         self.val_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True,
                                                     transform=self.val_transform)
-        self.val_loader = torch.utils.data.DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False)
+        self.val_loader = DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False)
 
         # invert normalization for tensor to image transform
         self.inv_normalize = transforms.Compose([

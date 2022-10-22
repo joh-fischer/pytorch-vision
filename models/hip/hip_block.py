@@ -26,21 +26,29 @@ from models.hip.transformer import TransformerBlock
 
 
 class HiPBlock(nn.Module):
-    def __init__(self, input_dim: int, groups: int,
-                 n_latents: int, latent_dim: int,
-                 sa_layers: int = 4, heads: int = 4,
-                 dropout: float = 0.2):
+    def __init__(self,
+                 in_dim: int,
+                 latent_dim: int,
+                 latent_heads: int,
+                 groups: int,
+                 n_latents: int,
+                 sa_dim_head: int = 32,
+                 sa_heads: int = 4,
+                 sa_layers: int = 4,
+                 dropout: float = 0.):
         """
-        Hierarchical Perceiver Block.
-
+        Hierarchical perceiver block (https://arxiv.org/abs/2202.10890).
         Args:
-            input_dim: Input dimension to the perceiver block.
-            groups: Number of groups for this block.
+            in_dim: Input dimension.
+            latent_dim: Channels or dimension of latent vectors over all heads, s.t.
+                the number of channels per head is (latent_dim / heads).
+            latent_heads: Number of heads for cross-attention.
+            groups: Number of groups.
             n_latents: Number of latent vectors per group.
-            latent_dim: Dimension of the latent vectors.
-            sa_layers: Number of self-attention layers.
-            heads: Number of heads for self- and cross-attention.
-            dropout: Dropout rate.
+            sa_dim_head: Dimension of keys, queries, values per head for self-attention.
+            sa_heads: Number of heads for self-attention.
+            sa_layers: Number of self-attention layers (transformer blocks).
+            dropout: p for dropout layers (default: 0).
         """
         super().__init__()
 
@@ -48,18 +56,14 @@ class HiPBlock(nn.Module):
 
         self.latents = nn.Parameter(torch.randn((self.groups, n_latents, latent_dim)))
 
-        self.cross_attn = CrossAttention(input_dim, latent_dim, heads)
+        self.cross_attn = CrossAttention(in_dim, latent_dim, latent_heads)
 
         self.transformer_blocks = nn.ModuleList([
-            TransformerBlock(latent_dim, heads, dropout)
+            TransformerBlock(latent_dim, sa_dim_head, sa_heads, dropout)
             for _ in range(sa_layers)
         ])
 
     def forward(self, x: torch.Tensor):
-        """
-        Args:
-            x: Input tensor with shape [bs, seq_len, dim]
-        """
         # group input
         x = einops.rearrange(x, 'b (g n) c -> b g n c', g=self.groups)
 
@@ -78,8 +82,8 @@ if __name__ == "__main__":
     bs = 32
 
     ipt = torch.randn((bs, 64*64, 16))
-    hip_block = HiPBlock(input_dim=16, groups=8,
-                         n_latents=32, latent_dim=64)
+    hip_block = HiPBlock(in_dim=16, latent_dim=64, latent_heads=4,
+                         groups=8, n_latents=32)
 
-    print("ipt:", ipt.shape)                # torch.Size([32, 4096, 32])
+    print("ipt:", ipt.shape)                # torch.Size([32, 4096, 16])
     print("out:", hip_block(ipt).shape)     # torch.Size([32, 256, 64])

@@ -10,10 +10,12 @@ in_channels = 3
 ipt = torch.randn((64, in_channels, 32, 32))
 print("input:", ipt.shape)
 
-resnet = ResNet()
+cfg = yaml.load(open('configs/resnet.yaml', 'r'), Loader=yaml.Loader)
+resnet = ResNet(**cfg)
 print(f"ResNet\n\tparams: {count_parameters(resnet)}\n\toutput: {resnet(ipt).shape}")
 
-vit = ViT()
+cfg = yaml.load(open('configs/vit.yaml', 'r'), Loader=yaml.Loader)
+vit = ViT(**cfg)
 print(f"ViT\n\tparams: {count_parameters(vit)}\n\toutput: {vit(ipt).shape}")
 
 cfg = yaml.load(open('configs/hip.yaml', 'r'), Loader=yaml.Loader)

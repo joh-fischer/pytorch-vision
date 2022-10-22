@@ -6,30 +6,34 @@ n_classes: 10
 start_dim: 16
 blocks_cfgs:
   # block 1
-  - input_dim: 16   # must be the same as `start_dim`
+  - in_dim: 16      # must be the same as `start_dim`
+    latent_dim: 32    # `latent_dim` must be divisible by `latent_heads`
+    latent_heads: 2
     groups: 4
-    sa_layers: 2
-    heads: 2
-    latent_dim: 32
     n_latents: 64
+    sa_layers: 2
+    dropout: 0.1
   # block 2
-  - input_dim: 32
-    groups: 2
-    sa_layers: 2
-    heads: 4
+  - in_dim: 32
     latent_dim: 64
+    latent_heads: 4
+    groups: 2
     n_latents: 64
-  # block 3
-  - input_dim: 64
-    groups: 1
-    sa_layers: 4
-    heads: 8
-    latent_dim: 128
-    n_latents: 64
-  # block 4
-  - input_dim: 128
-    groups: 1
     sa_layers: 2
-    heads: 8
+    dropout: 0.1
+  # block 3
+  - in_dim: 64
+    latent_dim: 96
+    latent_heads: 6
+    groups: 1
+    n_latents: 64
+    sa_layers: 4
+    dropout: 0.1
+  # block 4
+  - in_dim: 96
     latent_dim: 128
+    latent_heads: 8
+    groups: 1
     n_latents: 32
+    sa_layers: 2
+    dropout: 0.1

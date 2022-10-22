@@ -24,7 +24,7 @@ import einops
 
 
 class PosEmbedding2d(nn.Module):
-    def __init__(self, dim: int, height: int, width: int, mlp: bool = True):
+    def __init__(self, dim: int, height: int, width: int):
         super().__init__()
         assert dim % 4 == 0, f"Dim must be divisible by 4, got dim {dim}"
 
@@ -42,14 +42,11 @@ class PosEmbedding2d(nn.Module):
 
         self.pos_emb = einops.rearrange(pe, 'c h w -> (h w) c')
 
-        if mlp:
-            self.mlp = nn.Sequential(
+        self.mlp = nn.Sequential(
                 nn.Linear(dim, dim),
                 nn.SiLU(),
                 nn.Linear(dim, dim)
-            )
-        else:
-            self.mlp = nn.Identity()
+        )
 
     def forward(self, x: torch.Tensor):
         pos_emb = self.pos_emb.to(x.device)

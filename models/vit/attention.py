@@ -23,9 +23,9 @@ import einops
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, input_dim: int, dim: int = 64, n_heads: int = 4):
+    def __init__(self, input_dim: int, dim: int = 32, n_heads: int = 4):
         """
-        Multi-Head Attention module as described in Attention Is All
+        Multi-Head Attention module as described in "Attention Is All
         You Need" (https://arxiv.org/abs/1706.03762).
 
         Args:
