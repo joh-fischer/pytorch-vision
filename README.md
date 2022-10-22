@@ -13,9 +13,9 @@ epochs and didn't finetune them at all. ;)
 
 |                           Paper                            |          Code           |  Params   | Accuracy |
 |:----------------------------------------------------------:|:-----------------------:|:---------:|:--------:|
-|         [ResNet](https://arxiv.org/abs/1512.03385)         | [resnet](models/resnet) |  175,594  |  95.2%   |
-|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    |  305,802  |  60.7%   |
-| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,204,138 |  52.6%   |
+|         [ResNet](https://arxiv.org/abs/1512.03385)         | [resnet](models/resnet) |  175,594  |  78.7%   |
+|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    |  305,802  |  54.7%   |
+| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,204,138 |  46.9%   |
 
 ## Usage
 
