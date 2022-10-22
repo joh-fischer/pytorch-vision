@@ -87,6 +87,7 @@ class Logger:
         self.hparams = {}
 
         self.running_epoch = -1
+        self.global_train_step = 0
 
         self.epoch = {}
 

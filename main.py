@@ -7,12 +7,14 @@ from tqdm import tqdm
 
 import torch
 import torch.nn as nn
+from timm.loss import LabelSmoothingCrossEntropy
 
 from dataloader import CIFAR10
 
 from utils.logger import Logger
 from utils.helpers import load_checkpoint, timer, save_checkpoint
 from utils.helpers import get_model
+from utils.scheduler import cosine_scheduler
 
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification")
@@ -24,12 +26,26 @@ parser.add_argument('--epochs', default=2, type=int, metavar='N',
                     help='Number of epochs to run (default: 2)')
 parser.add_argument('--batch-size', default=64, metavar='N', type=int,
                     help='Mini-batch size (default: 64)')
-parser.add_argument('--lr', default=0.0001, type=float, metavar='LR',
-                    help='Initial learning rate (default: 0.001)')
 parser.add_argument('--gpus', default=0, type=int, nargs='+', metavar='GPUS',
                     help='If GPU(s) available, which GPU(s) to use for training.')
+
+# learning rate stuff
+parser.add_argument('--lr', default=0.001, type=float, metavar='LR',
+                    help='Initial learning rate (default: 0.001)')
+parser.add_argument('--use-scheduler', default=True, action=argparse.BooleanOptionalAction,
+                    help='Whether to use a cosine scheduler with linear warmup or not.')
+parser.add_argument('--min-lr', type=float, default=1e-6, metavar='LR',
+                    help='Lower lr bound for cyclic schedulers that hit 0 (1e-6)')
+parser.add_argument('--warmup-epochs', type=int, default=1, metavar='N',
+                    help='Epochs to warmup LR')
+
+parser.add_argument('--weight-decay', default=0.05, type=float, metavar='WD',
+                    help='Weight decay for optimizer (default: 0.05)')
+parser.add_argument('--smoothing', type=float, default=0.1,
+                    help='Label smoothing (default: 0.1)')
+
 parser.add_argument('--ckpt-save', default=False, action=argparse.BooleanOptionalAction, dest='save_checkpoint',
-                    help='Save checkpoints to folder')
+                    help='Save checkpoints to folder (default: False)')
 parser.add_argument('--load-ckpt', default=None, metavar='PATH', dest='load_checkpoint',
                     help='Load model checkpoint and train/evaluate.')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
@@ -69,8 +85,18 @@ def main():
     model.to(device)
 
     # loss function and optimizer
-    optimizer = torch.optim.Adam(model.parameters(), args.lr)
-    criterion = nn.CrossEntropyLoss().to(device)
+    optimizer = torch.optim.AdamW(model.parameters(), args.lr, weight_decay=args.weight_decay)
+
+    lr_schedule = None
+    if args.use_scheduler:
+        n_training_steps_per_epoch = data.n_train_samples // args.batch_size
+        lr_schedule = cosine_scheduler(args.lr, args.min_lr, args.epochs,
+                                       n_training_steps_per_epoch, args.warmup_epochs)
+
+    if args.smoothing > 0.:
+        criterion = LabelSmoothingCrossEntropy(smoothing=args.smoothing).to(device)
+    else:
+        criterion = nn.CrossEntropyLoss().to(device)
 
     if args.load_checkpoint:
         model, start_epoch = load_checkpoint(model, args.load_checkpoint, device)
@@ -87,8 +113,8 @@ def main():
         return
 
     # setup paths and logging
-    exp_name = args.model + '_' + args.name if args.name is not None else args.model
-    running_log_dir = os.path.join(LOG_DIR, exp_name)
+    exp_dir = os.path.join(args.model, args.name) if args.name is not None else args.model
+    running_log_dir = os.path.join(LOG_DIR, exp_dir)
     print("{:<16}: {}".format('logdir', running_log_dir))
     logger = Logger(running_log_dir, tensorboard=True)
     logger.log_hparams({**cfg, **vars(args)})
@@ -99,7 +125,7 @@ def main():
         logger.init_epoch(epoch)
         print(f"Epoch [{epoch + 1} / {args.epochs}]")
 
-        train(model, data.train, criterion, optimizer, device)
+        train(model, data.train, criterion, optimizer, device, lr_schedule)
         validate(model, data.val, criterion, device)
 
         # log to tensorboard
@@ -109,7 +135,8 @@ def main():
         logger.tensorboard.add_scalar('Loss/val', logger.epoch['val_loss'].avg, epoch)
 
         # output progress
-        print(f"{'loss':>8}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
+        print(f"{'global step':>8}: {logger.global_train_step} | "
+              f"{'loss':>5}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
               f"{'acc':>4}: {logger.epoch['acc'].avg:.4f} - {'val_acc':>4}: {logger.epoch['val_acc'].avg:.4f}")
 
         # save logs and checkpoint
@@ -122,12 +149,16 @@ def main():
     print(f"Total training time: {elapsed_time}")
 
 
-def train(model, train_loader, criterion, optimizer, device):
+def train(model, train_loader, criterion, optimizer, device, lr_schedule):
     model.train()
-    for x, y in tqdm(train_loader, desc="Training"):
+    loader = tqdm(train_loader, desc="Training")
+    for x, y in loader:
         x, y = x.to(device), y.to(device)
 
         y_hat = model(x)
+
+        if lr_schedule is not None:
+            optimizer.param_groups[0]['lr'] = lr_schedule[logger.global_train_step]
 
         loss = criterion(y_hat, y)
         optimizer.zero_grad()
@@ -139,6 +170,12 @@ def train(model, train_loader, criterion, optimizer, device):
 
         logger.log_metrics({'loss': loss, 'acc': acc},
                            phase='train', aggregate=True, n=x.shape[0])
+
+        if logger.global_train_step % 10 == 0:
+            loader.set_description(f"step: {logger.global_train_step} | "
+                                   f"lr: {optimizer.param_groups[0]['lr']:.1e}")
+
+        logger.global_train_step += 1
 
 
 @torch.no_grad()
