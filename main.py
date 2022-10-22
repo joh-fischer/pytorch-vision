@@ -16,7 +16,6 @@ from utils.helpers import load_checkpoint, timer, save_checkpoint
 from utils.helpers import get_model
 from utils.scheduler import cosine_scheduler
 
-# python3 main.py hip --name run0 --epochs 60 --batch-size 256 --gpus 7 --warmup-epochs 10
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification")
 parser.add_argument('model', choices=['resnet', 'vit', 'hip'], type=str, metavar='NAME',
@@ -136,7 +135,7 @@ def main():
         logger.tensorboard.add_scalar('Loss/val', logger.epoch['val_loss'].avg, epoch)
 
         # output progress
-        print(f"{'global step':>12}: {logger.global_train_step} | {'lr':>3}: {lr_schedule[logger.global_train_step]} | "
+        print(f"{'global step':>8}: {logger.global_train_step} | "
               f"{'loss':>8}: {logger.epoch['loss'].avg:.4f} - {'val_loss':>8}: {logger.epoch['val_loss'].avg:.4f} - "
               f"{'acc':>4}: {logger.epoch['acc'].avg:.4f} - {'val_acc':>4}: {logger.epoch['val_acc'].avg:.4f}")
 

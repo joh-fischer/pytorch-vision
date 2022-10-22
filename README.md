@@ -5,10 +5,10 @@ Implementation of a few popular vision models in PyTorch.
 
 ## Results
 
-Results of some trainings on `CIFAR10`. Each model is trained with AdamW optimizer, a batch size
-of 128, and a learning rate scheduler with linear warmup and cosine schedule. Please note,
-that the reported accuracies are far from what is possible with those models. I just trained them
-for a couple of epochs and didn't finetune them at all. ;)
+Results of some trainings on `CIFAR10`. Each model is trained with AdamW optimizer for 60 epochs using
+a cosine decay learning rate scheduler and 10 epochs linear warm-up. Please note, that the reported
+accuracies are far from what is possible with those models. I just trained them for a couple of
+epochs and didn't finetune them at all. ;)
 
 
 |                           Paper                            |          Code           |  Params   | Accuracy |
@@ -19,10 +19,10 @@ for a couple of epochs and didn't finetune them at all. ;)
 
 ## Usage
 
-You can train a model with
+You can train the models with
 
 ```
-python3 main.py resnet --name exp1 --epochs 2
+python3 main.py resnet --name exp1 --epochs 60 --batch-size 256 --warmup-epochs 10
 ```
 
 A list of supported models can be found in the results section (*code* column).
