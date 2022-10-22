@@ -13,8 +13,8 @@ those models. I just train them for a couple of epochs and don't finetune them a
 |                           Paper                            |          Code           |  Params   | Accuracy |
 |:----------------------------------------------------------:|:-----------------------:|:---------:|:--------:|
 |         [ResNet](https://arxiv.org/abs/1512.03385)         | [resnet](models/resnet) |  175,594  |  95.2%   |
-|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    | 1,200,906 |  60.7%   |
-| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,528,778 |  52.6%   |
+|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    |  305,546  |  60.7%   |
+| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,204,138 |  52.6%   |
 
 ## Usage
 
