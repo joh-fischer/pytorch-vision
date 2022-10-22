@@ -5,9 +5,10 @@ Implementation of a few popular vision models in PyTorch.
 
 ## Results
 
-Results of some trainings on CIFAR10. Each model is trained with Adam optimizer and batch size
-of 128. Please note, that the reported accuracies are far from what is possible with
-those models. I just train them for a couple of epochs and don't finetune them at all. ;)
+Results of some trainings on `CIFAR10`. Each model is trained with AdamW optimizer, a batch size
+of 128, and a learning rate scheduler with linear warmup and cosine schedule. Please note,
+that the reported accuracies are far from what is possible with those models. I just trained them
+for a couple of epochs and didn't finetune them at all. ;)
 
 
 |                           Paper                            |          Code           |  Params   | Accuracy |
