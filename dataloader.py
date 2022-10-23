@@ -18,8 +18,10 @@ class CIFAR10:
 
         self.batch_size = batch_size
 
-        self.mean = [0.491, 0.482, 0.446]
-        self.std = [1., 1., 1.]
+        #self.mean = [0.491, 0.482, 0.446]
+        #self.std = [1., 1., 1.]
+        self.mean = [0.5, 0.5, 0.5]
+        self.std = [0.5, 0.5, 0.5]
 
         self.train_transform = transforms.Compose([
             transforms.ToTensor(),
