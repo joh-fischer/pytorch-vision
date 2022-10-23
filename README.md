@@ -5,7 +5,7 @@ Implementation of a few popular vision models in PyTorch.
 
 ## Results
 
-Results of some trainings on `CIFAR10`. I train the models with AdamW optimizer for 60 epochs using
+Results of some trainings on `CIFAR10`. I train the models with AdamW optimizer for 90 pochs using
 a cosine decay learning rate scheduler and 10 epochs linear warm-up. Please note, that the reported
 accuracies are far from what is possible with those models, as I just train them for a couple of
 epochs and don't finetune them at all. ;)
@@ -14,8 +14,8 @@ epochs and don't finetune them at all. ;)
 |                           Paper                            |          Code           |  Params   | Accuracy |
 |:----------------------------------------------------------:|:-----------------------:|:---------:|:--------:|
 |         [ResNet](https://arxiv.org/abs/1512.03385)         | [resnet](models/resnet) |  175,594  |  78.7%   |
-|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    |  305,802  |  54.7%   |
-| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,204,138 |  46.9%   |
+|          [ViT](https://arxiv.org/abs/2010.11929)           |    [vit](models/vit)    |  305,802  |  68.4%   |
+| [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |    [hip](models/hip)    | 1,204,138 |  57.6%   |
 
 ## Usage
 
