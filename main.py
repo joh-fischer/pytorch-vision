@@ -12,7 +12,8 @@ from timm.loss import LabelSmoothingCrossEntropy
 from dataloader import CIFAR10
 
 from utils.logger import Logger
-from utils.helpers import load_checkpoint, timer, save_checkpoint
+from utils.helpers import load_checkpoint, save_checkpoint
+from utils.helpers import count_parameters, timer
 from utils.helpers import get_model
 from utils.scheduler import cosine_scheduler
 
@@ -83,6 +84,7 @@ def main():
     cfg = yaml.load(open(cfg_path, 'r'), Loader=yaml.Loader)
     model = get_model(args.model, cfg)
     model.to(device)
+    print(f"{'params':<16}: {count_parameters(model)}")
 
     # loss function and optimizer
     optimizer = torch.optim.AdamW(model.parameters(), args.lr, weight_decay=args.weight_decay)
