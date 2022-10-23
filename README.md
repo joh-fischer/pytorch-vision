@@ -5,10 +5,10 @@ Implementation of a few popular vision models in PyTorch.
 
 ## Results
 
-Results of some trainings on `CIFAR10`. Each model is trained with AdamW optimizer for 60 epochs using
+Results of some trainings on `CIFAR10`. I train the models with AdamW optimizer for 60 epochs using
 a cosine decay learning rate scheduler and 10 epochs linear warm-up. Please note, that the reported
-accuracies are far from what is possible with those models. I just trained them for a couple of
-epochs and didn't finetune them at all. ;)
+accuracies are far from what is possible with those models, as I just train them for a couple of
+epochs and don't finetune them at all. ;)
 
 
 |                           Paper                            |          Code           |  Params   | Accuracy |
