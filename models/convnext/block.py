@@ -6,11 +6,23 @@ from models.convnext.norm_2d import LayerNorm2D
 
 
 class ConvNeXtBlock(nn.Module):
-    def __init__(self,
-                 channels: int,
-                 kernel_size: int = 7,
-                 widening_factor: int = 4,
-                 eps: float = 1e-6):
+    def __init__(self, channels: int, kernel_size: int = 7,
+                 widening_factor: int = 4, eps: float = 1e-6):
+        """
+        A ConvNeXt block as described in https://arxiv.org/abs/2201.03545,
+        with the following structure:
+        depthwise-separable convolution -> layer norm -> 1x1 convolution
+        with width multiplier -> gelu activation -> 1x1 convolution to
+        reduce the channels.
+
+        Args:
+            channels: Input and output channels of the block.
+            kernel_size: The kernel size for the depthwise-separable
+                convolution (default as in the paper: 7)
+            widening_factor: Multiplier for the channels in the
+                inverted bottleneck 1x1 convolution.
+            eps: Epsilon for layer normalization.
+        """
         super().__init__()
         padding = kernel_size // 2
         self.ds_conv = DepthwiseSeparableConv(channels, channels, kernel_size, padding=padding)
@@ -38,5 +50,5 @@ if __name__ == "__main__":
     ipt = torch.randn((8, 16, 32, 32))
     dsc = ConvNeXtBlock(16)
 
-    print("input:", ipt.shape)          # torch.Size([8, 3, 64, 64])
-    print("output:", dsc(ipt).shape)    # torch.Size([8, 1, 64, 64])
+    print("input:", ipt.shape)          # torch.Size([8, 16, 32, 32])
+    print("output:", dsc(ipt).shape)    # torch.Size([8, 16, 32, 32])
