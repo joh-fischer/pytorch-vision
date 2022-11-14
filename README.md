@@ -2,6 +2,16 @@
 
 Implementation of a few popular vision models in PyTorch. 
 
+## Usage
+
+You can train the models with
+
+```
+python3 main.py resnet --name exp1 --epochs 60 --batch-size 256 --warmup-epochs 10
+```
+
+A list of supported models can be found in the results section (*code* column).
+
 
 ## Results
 
@@ -14,20 +24,10 @@ epochs and don't finetune them at all. ;)
 |                           Paper                            |            Code             |  Params   | Accuracy |
 |:----------------------------------------------------------:|:---------------------------:|:---------:|:--------:|
 |         [ResNet](https://arxiv.org/abs/1512.03385)         |   [resnet](models/resnet)   |  175,594  |  89.1%   |
-|        [ConvNeXt](https://arxiv.org/abs/2201.03545)        | [convnext](models/convnext) |  398,730  |  82.3%   |
+|        [ConvNeXt](https://arxiv.org/abs/2201.03545)        | [convnext](models/convnext) |  398,730  |  76.2%  |
 |          [ViT](https://arxiv.org/abs/2010.11929)           |      [vit](models/vit)      |  305,802  |  68.4%   |
 | [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |      [hip](models/hip)      | 1,204,138 |  57.6%   |
 
-
-## Usage
-
-You can train the models with
-
-```
-python3 main.py resnet --name exp1 --epochs 60 --batch-size 256 --warmup-epochs 10
-```
-
-A list of supported models can be found in the results section (*code* column).
 
 ### ResNet
 
@@ -46,7 +46,7 @@ model(x).shape      # [64, 10]
 ### ViT
 
 Dosovitskiy et al. ([2020](https://arxiv.org/abs/2010.11929)) propose the Vision Transformer (ViT), which
-simply applies the NLP Transformer Encoder to images.
+first patchifies the image and then simply applies the NLP Transformer encoder.
 
 ```python
 from models import ViT
@@ -80,3 +80,21 @@ train on classification with the HiP encoder. However, you can add the decoder s
 config file of the HiP (add some more blocks with decreasing `latent_dim` and increasing sequence length). Then
 the proposed masked auto-encoder pre-training ([MAE](https://arxiv.org/abs/2111.06377)) is quite
 straight-forward.
+
+
+### ConvNeXt
+
+Liu et al. ([2022](https://arxiv.org/abs/2201.03545)) gradually modernize a standard ResNet, by adapting the training
+procedure (optimizer, augmentations & regularizations), the macro design (stage compute ratio, patchify stem, depthwise
+separable convolutions & inverted bottleneck), and the micro design (GELU, fewer activation and normalization functions,
+layer normalization & convolutional downsampling).
+
+```python
+from models import ConvNeXt
+
+model = ConvNeXt()
+
+x = torch.randn((64, 3, 224, 224))
+model(x).shape      # [64, 1000] 
+```
+
