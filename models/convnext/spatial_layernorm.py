@@ -19,26 +19,25 @@
 # SOFTWARE.
 import torch
 import torch.nn as nn
+import einops
 
 
-class DepthwiseSeparableConv(nn.Module):
-    def __init__(self, in_channels: int, output_channels: int, kernel_size: int,
-                 padding: int = 0, hidden_multiplier: int = 1):
+class LayerNorm2D(nn.Module):
+    def __init__(self, dim: int, eps: float = 1e-6):
         super().__init__()
-        self.depth_wise = nn.Conv2d(in_channels, in_channels * hidden_multiplier,
-                                    kernel_size=kernel_size, padding=padding, groups=in_channels)
-        self.point_wise = nn.Conv2d(in_channels * hidden_multiplier, output_channels, kernel_size=1)
+        self.layer_norm = nn.LayerNorm(dim, eps)
 
     def forward(self, x: torch.Tensor):
-        x = self.depth_wise(x)
-        x = self.point_wise(x)
+        x = einops.rearrange(x, 'b c h w -> b h w c')
+        x = self.layer_norm(x)
+        x = einops.rearrange(x, 'b h w c -> b c h w')
 
         return x
 
 
 if __name__ == "__main__":
-    ipt = torch.randn((8, 3, 64, 64))
-    dsc = DepthwiseSeparableConv(3, 16, 3, padding=1)
+    ipt = torch.randn((8, 16, 32, 32))
+    dsc = LayerNorm2D(16)
 
-    print("input:", ipt.shape)          # torch.Size([8, 3, 64, 64])
-    print("output:", dsc(ipt).shape)    # torch.Size([8, 1, 64, 64])
+    print("input:", ipt.shape)          # torch.Size([8, 16, 32, 32])
+    print("output:", dsc(ipt).shape)    # torch.Size([8, 16, 32, 32])
