@@ -3,11 +3,13 @@ import torch.nn as nn
 
 from models.convnext.ds_conv import DepthwiseSeparableConv
 from models.convnext.norm_2d import LayerNorm2D
+from models.convnext.stochastic_depth import DropPath
 
 
 class ConvNeXtBlock(nn.Module):
     def __init__(self, channels: int, kernel_size: int = 7,
-                 widening_factor: int = 4, eps: float = 1e-6):
+                 widening_factor: int = 4, eps: float = 1e-6,
+                 drop_path: float = 0.):
         """
         A ConvNeXt block as described in https://arxiv.org/abs/2201.03545,
         with the following structure:
@@ -22,6 +24,7 @@ class ConvNeXtBlock(nn.Module):
             widening_factor: Multiplier for the channels in the
                 inverted bottleneck 1x1 convolution.
             eps: Epsilon for layer normalization.
+            drop_path: Probability of path dropping (Stochastic Depth).
         """
         super().__init__()
         padding = kernel_size // 2
@@ -30,6 +33,8 @@ class ConvNeXtBlock(nn.Module):
         self.conv1 = nn.Conv2d(channels, channels * widening_factor, kernel_size=1)
         self.gelu = nn.GELU()
         self.conv2 = nn.Conv2d(channels * widening_factor, channels, kernel_size=1)
+
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
 
     def forward(self, x: torch.Tensor):
         residual = x
@@ -41,7 +46,7 @@ class ConvNeXtBlock(nn.Module):
 
         x = self.conv2(x)   # reduce channels
 
-        x += residual
+        x = residual + self.drop_path(x)
 
         return x
 
