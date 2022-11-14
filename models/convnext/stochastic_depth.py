@@ -23,6 +23,12 @@ import torch.nn as nn
 
 class DropPath(nn.Module):
     def __init__(self, drop_prob: float = 0.):
+        """
+        Stochastic depth layer.
+
+        Args:
+            drop_prob: Probability of dropping the path.
+        """
         super().__init__()
         assert 0. <= drop_prob <= 1., f"Drop probability must be between 0 and 1, got {drop_prob}"
 

@@ -1,0 +1,5 @@
+# config file for ConvNeXt
+in_channels: 3
+image_size: 32
+n_classes: 10
+
