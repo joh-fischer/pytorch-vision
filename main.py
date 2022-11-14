@@ -19,7 +19,7 @@ from utils.scheduler import cosine_scheduler
 
 
 parser = argparse.ArgumentParser(description="PyTorch Image Classification")
-parser.add_argument('model', choices=['resnet', 'vit', 'hip'], type=str, metavar='NAME',
+parser.add_argument('model', choices=['resnet', 'vit', 'hip', 'convnext'], type=str, metavar='NAME',
                     help='Choose model')
 parser.add_argument('--name', '-n', default=None, type=str, metavar='NAME',
                     help='Experiment name and folder where logs are stored')

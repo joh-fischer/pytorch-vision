@@ -1,0 +1,12 @@
+# config file for ConvNeXt
+in_channels: 3
+n_classes: 10
+
+# settings for cifar10
+width: 16
+drop_path: 0.1
+stage_compute_ratios:
+  - 1
+  - 1
+  - 3
+  - 1
