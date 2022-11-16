@@ -59,7 +59,7 @@ class ResidualBlock(nn.Module):
         x = self.conv2(x)
         x = self.conv2_bn(x)
 
-        x += identity
+        x = x + identity
         x = self.activation(x)
 
         return x

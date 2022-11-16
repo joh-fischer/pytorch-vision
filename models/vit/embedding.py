@@ -64,7 +64,7 @@ class PatchEmbedding(nn.Module):
         x = torch.cat((batched_class_token, x), dim=1)
 
         # add learnable positional embedding
-        x += self.pos_emb
+        x = x + self.pos_emb
 
         return x
 
