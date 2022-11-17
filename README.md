@@ -7,7 +7,7 @@ Implementation of a few popular vision models in PyTorch.
 You can train the models with
 
 ```
-python3 main.py resnet --name exp1 --epochs 60 --batch-size 256 --warmup-epochs 10
+python3 main.py resnet --name exp1 --epochs 90 --batch-size 256 --warmup-epochs 10
 ```
 
 A list of supported models can be found in the results section (*code* column).
