@@ -23,7 +23,7 @@ epochs and don't finetune them at all. ;)
 You can train the models with
 
 ```
-python3 main.py resnet --name exp1 --epochs 90 --batch-size 256 --warmup-epochs 10
+python3 main.py resnet --epochs 90 --batch-size 256 --warmup-epochs 10 --name exp1
 ```
 
 A list of supported models can be found in the results section (*code* column).
