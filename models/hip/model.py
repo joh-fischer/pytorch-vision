@@ -23,11 +23,13 @@ import torch.nn as nn
 
 from models.hip.hip_block import HiPBlock
 from models.hip.embedding import PosEmbedding2d
+from models.hip.classification_head import ClassificationHead
 
 
 class HierarchicalPerceiver(nn.Module):
     def __init__(self, start_dim: int, blocks_cfgs: list,
-                 in_channels: int = 3, image_size: int = 32, n_classes: int = 10):
+                 in_channels: int = 3, image_size: int = 32,
+                 n_classes: int = 10, n_output_query_channels: int = 64):
         """
         Hierarchical Perceiver (https://arxiv.org/abs/2202.10890).
 
@@ -52,10 +54,7 @@ class HierarchicalPerceiver(nn.Module):
         ])
 
         last_dim = blocks_cfgs[-1]['latent_dim']
-        self.head = nn.Sequential(
-            nn.LayerNorm(last_dim),
-            nn.Linear(last_dim, n_classes)
-        )
+        self.head = ClassificationHead(last_dim, n_classes, n_output_query_channels)
 
     def forward(self, x: torch.Tensor):
         # reshape image to sequence
@@ -68,9 +67,6 @@ class HierarchicalPerceiver(nn.Module):
         for block in self.encoder_blocks:
             x = block(x)
 
-        # global average pooling like in SimpleViT?
-        x = x.mean(dim=1)
-
         out = self.head(x)
 
         return out
@@ -80,8 +76,8 @@ if __name__ == "__main__":
     ipt = torch.randn((64, 3, 32, 32))
 
     cfg = [
-        {'input_dim': 16, 'groups': 2, 'n_latents': 128, 'latent_dim': 64},
-        {'input_dim': 64, 'groups': 2, 'n_latents': 128, 'latent_dim': 64}
+        {'in_dim': 16, 'groups': 2, 'n_latents': 128, 'latent_dim': 64, 'latent_heads': 4},
+        {'in_dim': 64, 'groups': 2, 'n_latents': 128, 'latent_dim': 64, 'latent_heads': 4}
     ]
     hip = HierarchicalPerceiver(start_dim=16, blocks_cfgs=cfg)
 
