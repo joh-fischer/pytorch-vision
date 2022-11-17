@@ -2,17 +2,6 @@
 
 Implementation of a few popular vision models in PyTorch. 
 
-## Usage
-
-You can train the models with
-
-```
-python3 main.py resnet --name exp1 --epochs 90 --batch-size 256 --warmup-epochs 10
-```
-
-A list of supported models can be found in the results section (*code* column).
-
-
 ## Results
 
 Results of some trainings on `CIFAR10`. I train the models with AdamW optimizer for 90 pochs using
@@ -28,6 +17,18 @@ epochs and don't finetune them at all. ;)
 |          [ViT](https://arxiv.org/abs/2010.11929)           |      [vit](models/vit)      |  305,802  |  68.4%   |
 | [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |      [hip](models/hip)      | 1,204,138 |  57.6%   |
 
+
+## Usage
+
+You can train the models with
+
+```
+python3 main.py resnet --name exp1 --epochs 90 --batch-size 256 --warmup-epochs 10
+```
+
+A list of supported models can be found in the results section (*code* column).
+
+## Models
 
 ### ResNet
 
