@@ -14,7 +14,7 @@ epochs and don't finetune them at all. ;)
 |:----------------------------------------------------------:|:---------------------------:|:---------:|:--------:|
 |         [ResNet](https://arxiv.org/abs/1512.03385)         |   [resnet](models/resnet)   |  175,594  |  90.8%   |
 |        [ConvNeXt](https://arxiv.org/abs/2201.03545)        | [convnext](models/convnext) |  398,730  |  76.2%   |
-|          [ViT](https://arxiv.org/abs/2010.11929)           |      [vit](models/vit)      |  305,802  |  68.4%   |
+|          [ViT](https://arxiv.org/abs/2010.11929)           |      [vit](models/vit)      |  305,802  |  69.9%   |
 | [Hierarchical Perceiver](https://arxiv.org/abs/2202.10890) |      [hip](models/hip)      | 1,088,970 |  57.6%   |
 
 
