@@ -23,17 +23,9 @@ blocks_cfgs:
     dropout: 0.1
   # block 3
   - in_dim: 64
-    latent_dim: 96
-    latent_heads: 6
-    groups: 1
-    n_latents: 64
-    sa_layers: 4
-    dropout: 0.1
-  # block 4
-  - in_dim: 96
     latent_dim: 128
     latent_heads: 8
     groups: 1
-    n_latents: 32
-    sa_layers: 2
+    n_latents: 64
+    sa_layers: 4
     dropout: 0.1
